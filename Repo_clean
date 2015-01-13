@@ -1,0 +1,91 @@
+#!/bin/bash
+
+script_dir="$(dirname ${BASH_SOURCE[0]})" || exit 1
+cd "$script_dir" || exit 1
+
+function FAIL()
+{
+  set +x
+  echo -e "$0 failed in file: ${BASH_SOURCE[0]} \
+line: ${BASH_LINENO[0]}"
+  exit 1
+}
+
+function usage()
+{
+  cat <<END
+  
+  Usage: $0 [--help|-h]
+
+ This script removes all files that are automatically generated files that
+ are not in the github repository and are in your local copy of the source
+ tree in the directory:
+ 
+    $script_dir
+
+ Using 'make clean' and 'make distclean' do something simular, but 'make
+ clean' and 'make distclean' will not remove files that running
+ 'bootstrap' and 'quickbuild' generate and 'make' only acts on files that
+ are in your build directory tree which is not necessarily the same as
+ your source directory tree.
+
+ Be careful when you run this! This removes many many files using
+ wildcards.  Just look at this script source in:
+
+    ${BASH_SOURCE[0]}
+   
+ It's short.
+
+END
+
+exit 1
+}
+
+while [ -n "$1"  ] ; do
+  case "$1" in
+    --help|-h)
+      usage
+      ;;
+    *)
+      usage
+      ;;
+  esac
+  shift
+done
+
+
+
+function rm_common()
+{
+  rm -f *.o *.lo *.a *.so .deps_*\
+ .bin_* .lib_* GNUmakefile
+}
+
+set -x
+
+# Remove generated files that may be in the
+# source directory tree.
+
+
+###########################################################
+# top source directory files
+###########################################################
+rm -f README.html qb_config config.h
+rm_common
+
+###########################################################
+# subdirectory libstk/
+###########################################################
+cd libst/ || FAIL
+
+rm_common
+
+cd .. || FAIL
+###########################################################
+# subdirectory tests/
+###########################################################
+cd tests || FAIL
+rm_common
+rm -f hello
+cd .. || FAIL
+

@@ -1,0 +1,53 @@
+
+def set_package_info (info, option)
+
+###########################################################################
+#                     PACKAGE RELEASE CONFIGURATION
+###########################################################################
+
+
+# VERSION is added as a suffix in the tarball "release" filename
+
+info[:VERSION] = '0.1.0'
+
+
+# The package name
+
+info[:NAME] = 'st'
+
+
+# The package URL or homepage
+
+info[:URL] = 'https://github.com/lanceman2/' + info[:NAME] + '.git'
+
+
+# The package description
+
+info[:DESCRIPTION] = 'yet another simulation toolkit'
+
+
+#info[:CONFIG_H] = 'config.h'
+
+
+# adding package build options
+bool = option[:bool]
+path = option[:path]
+
+# adds option --STK_DEBUG [BOOL]
+# with default value given here
+# bool options that are false do not get defined in the make files
+
+#     name       default   description
+bool[:debug] = [ true,         'adds additional debugging code' ]
+
+
+# relative paths will be appended to the current working directory
+path[:prefix] = [ 'installed',  'top installation directory' ]
+
+
+ENV['CFLAGS'] = '-g -Wall -Werror' unless ENV['CFLAGS']
+
+
+
+end
+

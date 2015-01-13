@@ -1,0 +1,18 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+url=@URL@
+
+about=stk version: @VERSION@
+
+###################################
+# standard pkg-config options
+Name: @PACKAGE_NAME@
+Description: @DESCRIPTION@
+Version: @VERSION@
+Url: @PACKAGE_URL@
+Requires:
+Libs: -Wl,-rpath -Wl,${libdir} -L${libdir} -lst
+Cflags: -I${includedir}
