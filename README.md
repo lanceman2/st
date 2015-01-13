@@ -13,18 +13,12 @@ not.  It's a just starting.
 
 ## Building with quickbuild
 
-Put *quickbuild in your PATH (see below).
+Put quickbuild in your PATH (see below).
 From the top st source directory tree run something like:
 
 ```quickbuild --prefix=DIR && make -j4 install```
 
 Running quickbuild will generate make files named GNUmakefile.
-
-
-## Building with GNU autotools (not yet)
-
-
-This may happen.
 
 
 
@@ -49,18 +43,20 @@ Put *marked* in your PATH.
 
 ### quickbuild
 
-If you use quickbuild instead of GNU autotools, get the source by running:
+Get quickbuild source by running:
 
-```git clone https://github.com/lanceman2/quickbuild.git```
+  >```
+  >git clone https://github.com/lanceman2/quickbuild.git
+  >cd quickbuild
+  >make
+  >```
 
 Put *quickbuild* in you PATH.
 
 
 
-Markdown formating
-------------------
+#### GitHub Flavored Markdown
 
-GitHub Flavored Markdown
-https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
-https://help.github.com/articles/github-flavored-markdown/
++ https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
++ https://help.github.com/articles/github-flavored-markdown/
 

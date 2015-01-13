@@ -79,6 +79,7 @@ rm_common
 cd libst/ || FAIL
 
 rm_common
+rm debug.h lib_main.c st.pc
 
 cd .. || FAIL
 ###########################################################
