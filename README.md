@@ -4,10 +4,10 @@ st
 
 > simulation toolkit (st), yet another
 
-This is my personal general propose simulation toolkit.  C APIs (with C++
-interfaces) (application programming interfaces) and some scripts.  Tools
-to write computer programs that run in operator-in-the-loop real-time or
-not.  It's a just starting.
+This is my personal general propose simulation toolkit.  C APIs
+(application programming interfaces) and some scripts.  Tools to write
+computer programs that run in operator-in-the-loop real-time or not.  It's
+just starting.
 
 
 
