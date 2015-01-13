@@ -10,12 +10,6 @@ to write computer programs that run in operator-in-the-loop real-time or
 not.  It's a just starting.
 
 
-Choice of Build Systems
------------------------
-
-
-You have a choice between using one of two build systems:
-
 
 ## Building with quickbuild
 
