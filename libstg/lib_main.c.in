@@ -1,8 +1,8 @@
 #include <gnu/lib-names.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
-#include "st_debug.h"
+#include <stdbool.h>
+#include "../libst/st_debug.h"
 
 /* This is the stuff that will tell the compiler to make
  * this library one that can be executed. */

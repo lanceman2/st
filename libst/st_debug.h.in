@@ -1,0 +1,44 @@
+#define SEEN_ST_DEBUG
+
+#if @debug@ == 1
+#  define ST_DEBUG
+#endif
+
+
+#ifdef ST_DEBUG
+
+
+#  define __printf(a,b)  __attribute__((format(printf,a,b)))
+
+extern
+void stSpew(const char *file, int line,
+    const char *func, const char *format, ...) __printf(4,5);
+#  define ST_SPEW(fmt, ...)      stSpew(__FILE__, __LINE__, \
+                               __func__, fmt, ##__VA_ARGS__)
+
+extern
+void stAssert(const char *file, int line,
+    const char *func, bool bool_arg,
+    const char *arg, const char *format, ...)
+    __printf(6,7);
+
+#  define ST_ASSERT(x)          stAssert(__FILE__, __LINE__,            \
+                               __func__, (x), #x, " ")
+#  define ST_VASSERT(x, fmt, ...)                                       \
+                                stAssert(__FILE__, __LINE__, __func__,  \
+                                (x), #x, fmt, ##__VA_ARGS__)
+
+extern
+void stDebug_init(void);
+
+#  define ST_DEBUG_INIT()       stDebug_init()
+
+
+#else
+
+#  define ST_ASSERT(x)        /* empty macro */
+#  define ST_VASSERT(x, ...)  /* empty macro */
+#  define ST_SPEW(x, ...)     /* empty macro */
+#  define ST_DEBUG_INIT()     /* empty macro */
+
+#endif

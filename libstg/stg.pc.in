@@ -9,10 +9,10 @@ about=stk version: @VERSION@
 
 ###################################
 # standard pkg-config options
-Name: @PACKAGE_NAME@
-Description: @DESCRIPTION@
+Name: stg
+Description: @DESCRIPTION@ with glib
 Version: @VERSION@
 Url: @PACKAGE_URL@
-Requires:
-Libs: -Wl,-rpath -Wl,${libdir} -L${libdir} -lst -lpthread -ldl
+Requires: glib-2.0 st
+Libs: -Wl,-rpath -Wl,${libdir} -L${libdir} -lstg
 Cflags: -I${includedir}

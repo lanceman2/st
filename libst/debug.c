@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <stdbool.h>
 #include <sys/types.h>
+#include <dlfcn.h>
 #include <signal.h>
-#include "debug.h"
+#include "st_debug.h"
+
 
 void stSpew(const char *file, int line,
     const char *func, const char *format, ...)
@@ -18,8 +21,36 @@ void stSpew(const char *file, int line,
   va_end(ap);
 }
 
+static
+void sigHandler(int sig_num)
+{
+  ST_VASSERT(0, "We caught signal %d", sig_num);
+}
+
+void stDebug_init(void)
+{
+  static __thread bool in = false;
+  if(in) return;
+  in = true;
+  errno = 0;
+  ST_ASSERT(signal(SIGSEGV, sigHandler) != SIG_ERR);
+  ST_ASSERT(signal(SIGABRT, sigHandler) != SIG_ERR);
+
+  dlerror();
+  void (*stgDebug_init)(void) = NULL;
+  // See if we are linked with libstg.so with ST_DEBUG
+  // If so we call the stgDebug_init().
+  stgDebug_init = dlsym(RTLD_DEFAULT, "stgDebug_init");
+  char *error;
+  error = dlerror();
+  if(!error && stgDebug_init)
+    // stgDebug_init() is re-entrance safe
+    stgDebug_init();
+  in = false;
+}
+
 void stAssert(const char *file, int line,
-    const char *func, long bool_arg,
+    const char *func, bool bool_arg,
     const char *arg, const char *format, ...)
 {
   if(!bool_arg)
@@ -31,12 +62,12 @@ void stAssert(const char *file, int line,
       char error[64];
       error[63] = '\0';
       strerror_r(errno, error, 64);
-      fprintf(stderr, "QS_ASSERT: %s:%d:%s(): errno=%d:%s\n"
+      fprintf(stderr, "ST_ASSERT: %s:%d:%s(): errno=%d:%s\n"
         "ASSERTION(%s) FAILED: pid: %d\n",
         file, line, func, errno, error, arg, getpid());
     }
     else
-      fprintf(stderr, "QS_ASSERT: %s:%d:%s():\n"
+      fprintf(stderr, "ST_ASSERT: %s:%d:%s():\n"
         "ASSERTION(%s) FAILED: pid: %d\n",
         file, line, func, arg, getpid());
 

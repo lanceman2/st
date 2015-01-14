@@ -1,1 +1,1 @@
-SUBDIRS = libst tests
+SUBDIRS = libst libstg bin tests

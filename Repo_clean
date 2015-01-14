@@ -74,14 +74,26 @@ rm -f README.html qb_config config.h
 rm_common
 
 ###########################################################
-# subdirectory libstk/
+# subdirectory libst/
 ###########################################################
 cd libst/ || FAIL
 
 rm_common
-rm debug.h lib_main.c st.pc
+rm st_debug.h lib_main.c st.pc
 
 cd .. || FAIL
+
+
+###########################################################
+# subdirectory libstg/
+###########################################################
+cd libstg/ || FAIL
+
+rm_common
+rm lib_main.c stg.pc
+
+cd .. || FAIL
+
 ###########################################################
 # subdirectory tests/
 ###########################################################

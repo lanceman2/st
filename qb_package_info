@@ -46,7 +46,14 @@ path[:prefix] = [ 'installed',  'top installation directory' ]
 
 
 ENV['CFLAGS'] = '-g -Wall -Werror' unless ENV['CFLAGS']
+ENV['CFLAGS'] += ' -pthread'
 
+
+if ENV['CPPFLAGS']
+  ENV['CPPFLAGS'] = ENV['CPPFLAGS'] + ' -D_GNU_SOURCE'
+else
+  ENV['CPPFLAGS'] = '-D_GNU_SOURCE'
+end
 
 
 end

@@ -1,8 +1,0 @@
-#define SEEN_ST_DEBUG
-
-#if @debug@ == 1
-#  define ST_DEBUG
-#endif
-
-
-
