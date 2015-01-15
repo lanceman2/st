@@ -55,6 +55,10 @@ else
   ENV['CPPFLAGS'] = '-D_GNU_SOURCE'
 end
 
+# don't include examples/ in the quickbuild package
+# examples are for using with the installed package
+info[:SKIP_DIRS] = 'examples'
+
 
 end
 

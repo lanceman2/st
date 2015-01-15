@@ -79,7 +79,7 @@ rm_common
 cd libst/ || FAIL
 
 rm_common
-rm st_debug.h lib_main.c st.pc
+rm -f st_debug.h lib_main.c st.pc
 
 cd .. || FAIL
 
@@ -90,14 +90,25 @@ cd .. || FAIL
 cd libstg/ || FAIL
 
 rm_common
-rm lib_main.c stg.pc
+rm -f lib_main.c stg.pc
 
 cd .. || FAIL
 
 ###########################################################
+# subdirectory bin/
+###########################################################
+cd bin/ || FAIL
+
+rm_common
+rm -f st_launcher
+
+cd .. || FAIL
+
+
+###########################################################
 # subdirectory tests/
 ###########################################################
-cd tests || FAIL
+cd tests/ || FAIL
 rm_common
 rm -f hello
 cd .. || FAIL
