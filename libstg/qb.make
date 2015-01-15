@@ -4,3 +4,4 @@ ifndef debug
   libstg.so_NOTSOURCES := debug.c
 endif
 libstg.so_ADD_PKG := glib-2.0
+stg.h_SOURCES := stg_top.h stg_debug.h stg_bottom.h

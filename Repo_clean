@@ -79,7 +79,7 @@ rm_common
 cd libst/ || FAIL
 
 rm_common
-rm -f st_debug.h lib_main.c st.pc
+rm -f st_debug.h lib_main.c st.pc st.h
 
 cd .. || FAIL
 
@@ -90,7 +90,7 @@ cd .. || FAIL
 cd libstg/ || FAIL
 
 rm_common
-rm -f lib_main.c stg.pc
+rm -f lib_main.c stg.pc stg.h
 
 cd .. || FAIL
 
@@ -110,6 +110,18 @@ cd .. || FAIL
 ###########################################################
 cd tests/ || FAIL
 rm_common
-rm -f hello
+rm -f hello debug
+cd .. || FAIL
+
+###########################################################
+# subdirectory examples/
+###########################################################
+
+cd examples/ || FAIL
+if [ -f GNUmakefile ] ; then
+  make distclean
+else
+  rm -f GNUmakefile
+fi
 cd .. || FAIL
 
