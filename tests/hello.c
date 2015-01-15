@@ -4,6 +4,6 @@
 
 int main(void)
 {
-    printf("Hello\n");
+    printf("Hello %s\n", NAME);
     return 0;
 }

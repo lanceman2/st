@@ -9,9 +9,10 @@
 #include <dlfcn.h>
 #include <signal.h>
 #include "st_debug.h"
+#include "debug.h"
 
 
-void stSpew(const char *file, int line,
+void st_spew(const char *file, int line,
     const char *func, const char *format, ...)
 {
   fprintf(stderr, "%s:%s():%d: ", file, func, line);
@@ -27,29 +28,28 @@ void sigHandler(int sig_num)
   ST_VASSERT(0, "We caught signal %d", sig_num);
 }
 
-void stDebug_init(void)
+void st_init(void)
 {
-  static __thread bool in = false;
-  if(in) return;
-  in = true;
+  static __thread bool init = false;
+  if(init) return;
+  init = true;
   errno = 0;
   ST_ASSERT(signal(SIGSEGV, sigHandler) != SIG_ERR);
   ST_ASSERT(signal(SIGABRT, sigHandler) != SIG_ERR);
 
   dlerror();
-  void (*stgDebug_init)(void) = NULL;
-  // See if we are linked with libstg.so with ST_DEBUG
-  // If so we call the stgDebug_init().
-  stgDebug_init = dlsym(RTLD_DEFAULT, "stgDebug_init");
+  void (*stg_init)(void) = NULL;
+  // See if we are linked with libstg.so
+  // If so we call the stg_init().
+  stg_init = dlsym(RTLD_DEFAULT, "stg_init");
   char *error;
   error = dlerror();
-  if(!error && stgDebug_init)
-    // stgDebug_init() is re-entrance safe
-    stgDebug_init();
-  in = false;
+  if(!error && stg_init)
+    // stg_init() is re-entrance safe
+    stg_init();
 }
 
-void stAssert(const char *file, int line,
+void st_assert(const char *file, int line,
     const char *func, bool bool_arg,
     const char *arg, const char *format, ...)
 {

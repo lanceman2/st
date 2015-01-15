@@ -1,1 +1,1 @@
-hello_ADD_PKG := stg
+ADD_PKG := stg

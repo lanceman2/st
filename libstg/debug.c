@@ -3,11 +3,6 @@
 #include <stdbool.h>
 #include "../libst/st_debug.h"
 #include "stg_debug.h"
-
-#ifndef ST_DEBUG
-#  error "This file should not be compiled unless ST_DEBUG is defined"
-#endif
-
 #include <glib.h>
 
 
@@ -39,12 +34,12 @@ void logHandler(const gchar *log_domain,
       log_domain, log_level, message);
 }
 
-void stgDebug_init(void)
+void stg_init(void)
 {
-  static __thread bool in = false;
-  if(in) return;
-  in = true;
-  stDebug_init(); // stDebug_init() is re-entrance safe
+  static __thread bool init = false;
+  if(init) return;
+  init = true;
+  st_init(); // stDebug_init() is re-entrance safe
   g_log_set_handler(NULL,
       G_LOG_LEVEL_WARNING | G_LOG_FLAG_FATAL |
       G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL |
@@ -62,5 +57,4 @@ void stgDebug_init(void)
       G_LOG_LEVEL_WARNING | G_LOG_FLAG_FATAL |
       G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL |
       G_LOG_FLAG_RECURSION, logHandler, NULL);
-  in = false;
 }

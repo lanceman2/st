@@ -1,10 +1,10 @@
 #include <stdbool.h>
-#include "../libst/st_debug.h"
-#include "../libstg/stg_debug.h"
+#include "../libst/st.h"
+#include "../libstg/stg.h"
 
 int main(void)
 {
-  ST_DEBUG_INIT();
+  st_init();
 
   ST_VASSERT(0, "testing ST_ASSERT(0)\n");
 

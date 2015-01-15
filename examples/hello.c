@@ -2,7 +2,7 @@
 
 int main(void)
 {
-  ST_DEBUG_INIT();
+  st_init();
 
   ST_VASSERT(0, "testing ST_VASSERT(0)\n");
 
