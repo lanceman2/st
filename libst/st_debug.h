@@ -1,4 +1,3 @@
-#define SEEN_ST_DEBUG
 
 #  define __printf(a,b)  __attribute__((format(printf,a,b)))
 

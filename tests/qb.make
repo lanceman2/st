@@ -4,3 +4,4 @@ NO_INSTALL := .
 #BINS := .  it's the default
 debug_LIBADD := ../libst/libst.so ../libstg/libstg.so
 debug_ADD_PKG := glib-2.0
+stVector_print_LIBADD := ../libst/libst.so

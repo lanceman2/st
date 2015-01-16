@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "st_debug.h"
+#include "debug.h"
 
 /* This is the stuff that will tell the compiler to make
  * this library one that can be executed. */
@@ -34,8 +34,8 @@ void _lib_main(void)
 	 " ------------------------------------------------\n"
 	 "      BUILD OPTIONS\n"
 	 "\n"
-#ifdef ST_DEBUG
-	 "    This is a DEBUG BUILD.  ST_DEBUG was defined.\n"
+#ifdef DEBUG
+	 "    This is a DEBUG BUILD.  DEBUG was defined.\n"
 #else
 	 "    This is NOT a DEBUG BUILD.  ST_DEBUG was not defined.\n"
 #endif

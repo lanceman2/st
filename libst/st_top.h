@@ -2,3 +2,4 @@
 #  define SEEN_ST_H
 
 #include <stdbool.h>
+#include <stdio.h>
