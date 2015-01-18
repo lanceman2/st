@@ -13,6 +13,6 @@ Name: stg
 Description: @DESCRIPTION@ with glib
 Version: @VERSION@
 Url: @PACKAGE_URL@
-Requires: glib-2.0 st
+Requires: glib-2.0 gsl st
 Libs: -lstg
 Cflags:

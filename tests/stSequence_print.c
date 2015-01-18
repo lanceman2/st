@@ -11,12 +11,12 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  struct StVector *v;
+  struct StSequence *s;
 
-  v = stVector_create("-", 0);
+  s = stSequence_createFile("-", 0);
 
-  stVector_print(v, stdout);
+  stSequence_print(s, stdout);
 
-  stVector_destroy(v);
+  stSequence_destroy(s);
   return 0;
 }

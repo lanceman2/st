@@ -1,0 +1,6 @@
+hello
+debug
+# TODO replace this file with program that spews
+stSequence_print < xxx.csv | quickplot -
+stSequence_deriv | quickplot -L - -g "0 2 0 3"
+

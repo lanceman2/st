@@ -4,7 +4,8 @@
 extern
 void st_spew(const char *file, int line,
     const char *func, const char *format, ...) __printf(4,5);
-#  define ST_SPEW(fmt, ...)      stSpew(__FILE__, __LINE__, \
+
+#  define ST_SPEW(fmt, ...)      st_spew(__FILE__, __LINE__, \
                                __func__, fmt, ##__VA_ARGS__)
 
 extern

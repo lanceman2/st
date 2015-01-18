@@ -59,12 +59,11 @@ void st_assert(const char *file, int line,
 
     if(errno)
     {
-      char error[64];
-      error[63] = '\0';
-      strerror_r(errno, error, 64);
+      char s[64], *e_str;
+      e_str = strerror_r(errno, s, 64);
       fprintf(stderr, "ST_ASSERT: %s:%d:%s(): errno=%d:%s\n"
         "ASSERTION(%s) FAILED: pid: %d\n",
-        file, line, func, errno, error, arg, getpid());
+        file, line, func, errno, e_str, arg, getpid());
     }
     else
       fprintf(stderr, "ST_ASSERT: %s:%d:%s():\n"

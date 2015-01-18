@@ -1,12 +1,11 @@
-
-#define ST_FLOAT
-//#define ST_DOUBLE
-
+/* private type stuff */
 
 #ifdef ST_FLOAT
-typedef float StReal_t;
 #  define STRTOF    strtof
 #  define FMT       "%.7g"
 #endif
-
+#ifdef ST_DOUBLE
+#  define STRTOF    strtod
+#  define FMT       "%.16g"
+#endif
 

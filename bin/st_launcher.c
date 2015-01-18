@@ -74,8 +74,10 @@ void setLabelString(struct Run *run)
       break;
   }
 
-  text = g_strdup_printf("%s", run->program);
-  
+  text = g_markup_printf_escaped("%s", run->program);
+
+  // We make all the labels the same length
+  // by padding with white space.
   char *old;
   old = text;
   text = g_strdup_printf(
