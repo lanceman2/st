@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -8,23 +9,7 @@
 #include "type.h"
 #include "st_sequence.h"
 #include "debug.h"
-
-
-// Example: a 3D sequence with 1000 points
-// It's more like a vector function x[], y[], z[]
-// A vector sequence.
-
-struct StSequence
-{
-  // channels are not interlaced
-  // x[0], x[1], x[2] are like x[], y[], z[]
-  StReal_t **x;
-  int dim;    // dimensions 1, 2, 3, ...
-  size_t len; // number of dim-D points like 10,000
-#ifdef DEBUG
-  size_t bufLen; // bufLen = number of StReal_t allocated
-#endif
-};
+#include "sequence.h"
 
 
 int stSequence_getDim(struct StSequence *v)
@@ -77,22 +62,90 @@ StReal_t **stSequence_x(struct StSequence *v)
   return v->x;
 }
 
+void stSequence_setLabel(struct StSequence *s, int dim,
+    const char *fmt, ...)
+{
+  ASSERT(s);
+  ASSERT(s->x);
+  ASSERT(s->x[0]);
+  ASSERT(s->dim > 0);
+  ASSERT(s->len);
+  ST_ASSERT(dim < s->dim);
+  ASSERT(s->label[dim]);
+
+  free(s->label[dim]);
+
+  char str[64];
+  va_list ap;
+  va_start(ap, fmt);
+  ST_ASSERT(vsnprintf(str, 64, fmt, ap) >= 0);
+  va_end(ap);
+  s->label[dim] = strdup(str);
+}
+
+void _stSequence_appendDim(struct StSequence *s, const char *labelFmt, ...)
+{
+  ASSERT(s);
+  ASSERT(s->x);
+  ASSERT(s->x[0]);
+  ASSERT(s->dim > 0);
+  ASSERT(s->len);
+  s->x = realloc(s->x, sizeof(StReal_t *)*(s->dim+1));
+  ST_ASSERT(s->x);
+  s->x[s->dim] = malloc(sizeof(StReal_t)*s->bufLen);
+  ST_ASSERT(s->x[s->dim]);
+  
+  s->label = realloc(s->label, sizeof(char **)*(s->dim+2));
+  s->label[s->dim+1] = NULL;
+
+  if(!labelFmt || !labelFmt[0])
+  {
+    char str[8];
+    ST_ASSERT(snprintf(str, 8, "x%d", s->dim) > 0);
+    s->label[s->dim] = strdup(str);
+  }
+  else
+  {
+    char str[64];
+    va_list ap;
+    va_start(ap, labelFmt);
+    ST_ASSERT(vsnprintf(str, 64, labelFmt, ap) >= 0);
+    va_end(ap);
+    s->label[s->dim] = strdup(str);
+  }
+
+  ++s->dim;
+}
+
 struct StSequence *stSequence_create(size_t len, int dim)
 {
   ASSERT(dim > 0);
   ASSERT(len);
   StReal_t **x;
+  char **label;
   x = malloc(sizeof(*x)*dim);
   ST_ASSERT(x);
+  label = malloc(sizeof(char*)*dim+1);
+  ST_ASSERT(label);
+  label[dim] = NULL;
   int i;
   for(i=0;i<dim;++i)
+  {
+    char s[8];
     x[i] = malloc(sizeof(StReal_t)*len);
+    ST_ASSERT(x[i]);
+    snprintf(s,8,"x%d", i);
+    label[i] = strdup(s);
+    ST_ASSERT(label[i]);
+  }
   struct StSequence *v;
   v = malloc(sizeof(*v));
   ST_ASSERT(x);
   v->x = x;
   v->len = len;
   v->dim = dim;
+  v->bufLen = len;
+  v->label = label;
   return v;
 }
 
@@ -144,7 +197,6 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
   else
     dim = d;
 
-
   size_t bufLen = 1;
 
 
@@ -188,12 +240,22 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
     }
   }
 
-
   if(path && path[0] && (path[0] != '-' || path[1] != '\0'))
     fclose(file);
 
   if(line)
     free(line);
+
+  char **label;
+  label = malloc(sizeof(*label)*(dim+1));
+  ST_ASSERT(label);
+  for(d=0;d<dim;++d)
+  {
+    char s[8];
+    snprintf(s,8,"x%d", d);
+    label[d] = strdup(s);
+    ST_ASSERT(label[d]);
+  }
 
   struct StSequence *v;
 
@@ -201,9 +263,7 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
   v->x = x;
   v->dim = dim; // dim = 1, 2, 3 as in 1D, 2D ...
   v->len = len; // number of dimD points
-#ifdef DEBUG
   v->bufLen = bufLen;
-#endif
   return v;
 }
 
@@ -213,6 +273,7 @@ void stSequence_print(struct StSequence *v, FILE *file)
   ASSERT(v->x);
   ASSERT(v->dim > 0);
   ASSERT(v->len);
+  ASSERT(v->label);
   ASSERT(file);
 
   size_t i, len;
@@ -221,6 +282,12 @@ void stSequence_print(struct StSequence *v, FILE *file)
   len = v->len;
   dim = v->dim;
   x = v->x;
+
+  fprintf(file, "%s", v->label[0]);
+  for(j=1; j<dim; ++j)
+    fprintf(file, " %s", v->label[j]);
+  fprintf(file, "\n");
+
   for(i=0; i<len; ++i)
   {
     for(j=0; j<dim; ++j)
@@ -235,17 +302,26 @@ void stSequence_destroy(struct StSequence *v)
   ASSERT(v->x);
   ASSERT(v->dim);
   ASSERT(v->len);
+  ASSERT(v->label);
   int i;
 #ifdef DEBUG
   for(i=0;i<v->dim;++i)
+  {
     memset(v->x[i], 0, v->bufLen*sizeof(StReal_t));
+    ASSERT(v->label[i]);
+  }
 #endif
   for(i=0;i<v->dim;++i)
+  {
     free(v->x[i]);
+    free(v->label[i]);
+  }
 #ifdef DEBUG
   memset(v->x, 0, sizeof(StReal_t*)*v->dim);
+  memset(v->label, 0, sizeof(char*)*(v->dim+1));
 #endif
   free(v->x);
+  free(v->label);
 #ifdef DEBUG
   memset(v, 0, sizeof(*v));
 #endif

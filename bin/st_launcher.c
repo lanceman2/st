@@ -60,7 +60,6 @@ cleanup:
 static
 void setLabelString(struct Run *run)
 {
-  char *text = NULL;
   GtkLabel *label;
   label = GTK_LABEL(gtk_bin_get_child(GTK_BIN(run->button)));
   char *color;
@@ -74,30 +73,29 @@ void setLabelString(struct Run *run)
       break;
   }
 
-  text = g_markup_printf_escaped("%s", run->program);
+  // We make a label that has the same length for all labels.
 
-  // We make all the labels the same length
-  // by padding with white space.
-  char *old;
-  old = text;
-  text = g_strdup_printf(
+  char *t1, *t2;
+  t1 = g_strdup_printf("%s "
+      "                                                  "
+      "                                                  ",
+      run->program);
+  t2 = g_strdup_printf("%100.100s", t1);
+  g_free(t1);
+  t1 = g_markup_printf_escaped("%s", t2);
+  g_free(t2);
+  t2 = g_strdup_printf(
           "<span font_family=\"monospace\" "
           ">%4d)  </span>"
           "<span font_family=\"monospace\" "
           "font_weight=\"bold\" "
-          "color=\"%s\">%s %s",
-          run->run_count++, color, old,
-          "                                                 "
-          "                                                 "
-          "                                                 ");
-  g_free(old);
-  old = text;
-  text = g_strdup_printf(
-          "%168.168s</span>", old);
-  g_free(old);
+          "color=\"%s\">%s</span>",
+          run->run_count++, color, t1);
+  g_free(t1);
 
-  gtk_label_set_markup(label, text);
-  g_free(text);
+  gtk_label_set_markup(label, t2);
+
+  g_free(t2);
 }
 
 static bool run_cb(GtkWidget *button, struct Run *run)

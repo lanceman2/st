@@ -6,8 +6,6 @@ extern
 struct StSequence *stSequence_create(size_t len, int dim);
 extern
 StReal_t **stSequence_x(struct StSequence *s);
-extern
-struct StSequence *stSequence_create(size_t len, int dim);
 
 /* Reads path of format (dim=2) like:
    x , y
@@ -28,4 +26,7 @@ extern
 void stSequence_destroy(struct StSequence *v);
 extern
 void stSequence_print(struct StSequence *v, FILE *file);
+extern
+void stSequence_setLabel(struct StSequence *v, int dim,
+    const char *fmt, ...) ST__printf(3,4);
 
