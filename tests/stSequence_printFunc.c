@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 
   struct StSequence *s;
 
-  s = stSequence_create(N, 2);
+  s = stSequence_create(N, 2, "x y");
   StReal_t *x, *y;
   x = stSequence_x(s)[0];
   y = stSequence_x(s)[1];

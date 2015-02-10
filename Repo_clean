@@ -110,8 +110,8 @@ cd .. || FAIL
 ###########################################################
 cd tests/ || FAIL
 rm_common
-rm -f hello debug stSequence_print\
- stSequence_deriv stSequence_printFunc
+rm -f hello debug stSequence_readStdin\
+ stSequence_printFunc
 cd .. || FAIL
 
 ###########################################################

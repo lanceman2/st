@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang=en>
+  <head>
+    <title>Numerical Differentiation</title>
+     <script src="/home/lanceman/public_html/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
+    </script>
+  </head>
+  <body>
+ 
+    <h1>Notes on Numerical Differentiation</h1>
+
+    <p>
+    Using "The Method of Undetermined Coefficients" we find the forms we
+    need to calculate derivatives of functions that are represented as
+    a sequence of variable values at fixed intervals.  We don't have more
+    information about the "functions" than that.  This data clearly has
+    many regions that are not differentiable.  The data has many defects:
+    missing points, noise, round-off, and a low sample rate.  Granted all
+    data sucks to some degree, but this stuff is bad; and so we need to
+    deal with it.
+    </p>
+
+    <p>
+    We will calculate derivatives with the same sample rate as given.
+    We will test the derivative values by comparing calculations with
+    varying number of points as input.
+    </p>
+
+
+    <h3>Derivative Forward 2 Points</h3>
+
+    <p>
+      We start with an easy case which we already know the answer to:
+
+      \[
+      f^\prime(x) = A f(x) + B f(x+h) \label{df2_1}
+      \]
+      where \(f(x)\) is our function of \(x\),
+      \(f^\prime (x)\) is the
+      derivative with respect to \(x\), \(h\) is our fixed change in \(x\),
+      and \(A\), and \(B\), are constants that we must find that are
+      dependent on \(h\).
+    </p>
+
+    <p>
+      From Taylor series we have
+
+      \[
+      f(x+h) = f(x) + h f^\prime(x) + \frac{h^2}{2} f^{\prime\prime}(x) +
+      \dots  \label{taylor}
+      \]
+
+      where \(x\) is the constant value we expand about, and \(x+h\) is the
+      variable that we plugged in.  Note, this is not the usual form of a
+      Taylor series function expansion.  You need to confirm this from a
+      common form like
+
+      \[
+          f(x) = \sum_{n=0}^\infty \frac{f^n(a)}{n!} (x - a)^n \mathrm{,}
+      \]
+
+      where \(a\) is a constant and \(f^n(a)\) is the \(n\)-th derivative of
+      \(f(x)\) with respect to \(x\) evaluated at \(x \to a\).
+
+    </p>
+
+    <p>
+    Plugging [\(\ref{taylor}\)] into [\(\ref{df2_1}\)] gives
+
+    \[
+     f^\prime(x) = A f(x) + B \left[f(x) + h f^\prime(x) +
+     \frac{h^2}{2} f^{\prime\prime}(x) + \dots \right] \label{df2_2},
+    \]
+
+    which we rearrange to give
+
+
+    \[
+      0 = \left[ A + B \right] f(x) + \left[ B h - 1 \right] f^\prime(x) +
+     B \frac{h^2}{2} f^{\prime\prime}(x) + \dots \label{df2_3}
+    \]
+
+    We intend to get an expression that we'll call an approximation for
+    the first derivative of our data.  But this only works well if the
+    sample rate is high enough (\(h\) is small) and the noise is low enough.
+    We assert that successive derivatives of the function are
+    unrelated and higher order Taylor terms tend to get smaller.
+    Any who, we next solve
+
+    \begin{align}
+
+       0 & = A + B \\
+       1 & = 0 + B h
+    \end{align}
+
+    so
+
+      \[  A = - \frac{1}{h}  \quad B = \frac{1}{h} \]
+
+      and so [\(\ref{df2_1}\)] becomes
+
+      \[ f^\prime(x) = \frac{f(x+h) - f(x)}{h} \label{f2_result}\]
+
+      the two point forward differencing derivative approximation.
+      We can use the higher order terms to get ideas about how
+      approximate this is.
+    </p>
+
+    <h4>Lets try a different way</h4>
+    
+    <p>
+    We require that this work perfectly for the linear function
+    
+    \[ f(x) = ax + b \label{df2_5}\]
+
+    giving
+
+    \[ f^\prime(x) = a \mathrm{.} \label{df2_6}\]
+
+    Plugging [\(\ref{df2_5}\)] into [\(\ref{df2_1}\)] and using
+    [\(\ref{df2_6}\)] gives
+
+    \[ a = A a x + A b + B a x + B a h + B b \]
+
+    which we rewrite as
+
+    \[ a =  A b + B a h + B b + x \left( A a + B a \right) \label{df2_7}
+    \mathrm{.} \]
+
+    We require that [\(\ref{df2_7}\)] be valid for all values of \(x\),
+    therefore we have the set of equations
+
+    \begin{align}
+
+    a = & A b + B (a h + b) \\
+
+    0 = & A a + B a \mathrm{,}\\
+
+    \end{align}
+  
+    giving us \(A = -\frac{1}{h}\) and \(B = \frac{1}{h}\) as before.
+    </p>
+
+    <p>
+    We note that the method that uses Taylor series appears simpler
+    by not introducing as many superfluous constants (\(a\) and \(b\)).
+    We find that when finding expressions with more terms the Taylor
+    series method is quicker and gives the same result.
+    The proof is similar to proving Taylor series, so we guess.
+    So from here out we'll use the Taylor series method and than check
+    the result by seeing that a polynomial function of order \(N-1\),
+    where \(N\) is the number of function evaluations, gives the exact
+    derivative.  In the above case \(N = 2\).
+    </p>
+
+
+    
+    <h3>Derivative Forward 3 Points</h3>
+
+  <p>
+
+  \[ f^\prime(x) = A f(x) + B f(x+h) + C f(x+2h) \label{f3_1} \]
+
+  From [\(\ref{taylor}\)] with \(h \to 2 h\) we have
+
+  \[ f(x+2 h) = f(x) + 2 h f^\prime(x) + 2 h^2 f^{\prime\prime}(x) +
+      \dots  \label{taylor2} \]
+
+  and so
+
+  \begin{align}
+     f^\prime(x) = & A f(x) + \nonumber \\
+                   & B \left[f(x) + h f^\prime(x) +
+                          \frac{h^2}{2} f^{\prime\prime}(x) +
+                          \dots \right] + \nonumber \\
+                   & C \left[
+         f(x) + 2 h f^\prime(x) + 2 h^2 f^{\prime\prime}(x) +
+         \dots
+         \right] \mathrm{,} \\ \label{df3_2}
+  \end{align}
+
+  and so
+
+    \begin{align}
+     0 = & \left[A + B               +   C\right] f(x) + \nonumber \\
+         & \left[-1 + B h             + 2 C h \right] f^\prime(x) + \nonumber \\
+         & \left[0 + B \frac{h^2}{2} + 2 C h^2 \right] f^{\prime\prime}(x)
+         + \nonumber \\ & \dots
+    \end{align}
+  </p>
+
+  <p>
+   Again, we assert that successive derivatives of the function are
+    unrelated and higher order Taylor terms tend to get smaller, gives us
+    the following 3 equations needed to solve for the 3 unknown constants
+    \(A\), \(B\), and \(C\):
+
+    \begin{align}
+    0 & = A + B + C \nonumber\\
+    1 & = 0 + B h + 2 C h \nonumber\\
+    0 & = 0 + B \frac{h^2}{2} + 2 C h^2
+    \end{align}
+
+    giving
+
+   \[ A = - \frac{3}{2h} \quad B = \frac{4}{2h}  \quad C = - \frac{1}{2h}
+   \mathrm{.}
+   \label{ABC_f3}\]
+
+   Plugging [\(\ref{ABC_f3}\)] into [\(\ref{f3_1}\)] gives
+
+   \[ f^\prime(x) = \frac{ -3 f(x) + 4 f(x + h) - f(x + 2h)}{2 h}
+   \mathrm{.}  \label{f3_form}\]
+  </p>
+
+  <p>
+  As a test of [\(\ref{f3_form}\)] we see that if \( f(x) = ax^2 + bx + c
+  \) we get \(f^\prime(x) = 2ax + b\), so it works as expected for a
+  quadratic function.
+  </p>
+
+
+  <h3>Derivative Forward 4 Points</h3>
+
+  <p>
+
+  We are looking for the constants \(A\), \(B\), \(C\) and \(D\) in
+
+  \[ f^\prime(x) = A f(x) + B f(x+h) + C f(x+2h) + D f(x + 3h)
+  \mathrm{.} \label{f4_1} \]
+
+  Applying Taylor series to the right-hand-side of [\(\ref{f4_1}\)] gives
+
+  \begin{align}
+
+  f^\prime(x) = & A f(x) + \nonumber \\
+                & B \left[ f(x) + h f^\prime(x) +
+                           \frac{h^2}{2} f^{\prime\prime}(x) +
+                           \frac{h^3}{6} f^{\prime\prime\prime}(x) + \dots
+                    \right] + \nonumber \\
+                & C \left[ f(x) + 2 h f^\prime(x) +
+                           2 h^2 f^{\prime\prime}(x) +
+                           \frac{4 h^3}{3} f^{\prime\prime\prime}(x) + \dots
+                    \right] + \nonumber \\
+                & D \left[ f(x) + 3 h f^\prime(x) +
+                           \frac{9 h^2}{2} f^{\prime\prime}(x) +
+                           \frac{9 h^3}{2} f^{\prime\prime\prime}(x) + \dots
+                    \right] \\
+  \end{align}
+
+
+  Requiring that the coefficient of the terms of each derivative of \(f(x)\) be zero
+  gives us
+
+
+  \begin{align}
+          0           = & A + B + C + D \nonumber \\
+          \frac{1}{h} = & 0 + B + 2 C + 3 D \nonumber \\
+          0 =           & 0 + B + 4 C + 9 D
+                        \nonumber \\
+                        0 =           & 0 + B + 8\, C + 27\, D \mathrm{.}\\
+  \end{align}
+
+  Using axiom one-liner
+
+  <pre>
+    inverse(matrix([[1,1,1,1],[0,1,2,3],[0,1,4,9],[0,1,8,27]]))*vector([0,1/h,0,0]) 
+  </pre>
+
+  we get
+
+  \[ A = - \frac{11}{6 h} \quad B = \frac{3}{h} \quad C = - \frac{3}{2 h}
+     \quad D = \frac{1}{3 h} \]
+
+  giving the 4 point forward differencing derivative approximation:
+
+  \[ f^\prime(x) = - \frac{11}{6 h} f(x) + \frac{3}{h} f(x + h) -
+                   \frac{3}{2 h} f(x + 2 h) + \frac{1}{3 h} f(x + 3 h)
+                   \mathrm{.} \label{f4_r}
+  \]
+
+  Testing with general cubic function,
+  
+  \[ f(x) = a x^3 + b x^2 + c x + d \]
+
+  using axiom code to avoid using lots of paper,
+
+  <pre>
+    function(a * x**3 + b * x**2 + c * x + d, f, x)
+    function(-11*f(x)/(6*h)+3*f(x+h)/h-3*f(x+2*h)/(2*h)+f(x+3*h)/(3*h), fprime, x)
+    fprime(x)
+  </pre>
+
+  gives,
+
+  \[ f^\prime(x) = 3 a x^2 + 2 b x + c \mathrm{,}\]
+
+  so we see it works perfectly for \(f(x)\) being any cubic polynomials in \(x\).
+  </p>
+
+
+  <h3>Derivative Forward 5 Points</h3>
+
+  <p>
+
+  We are looking for the constants \(A\), \(B\), \(C\), \(D\), and \(E\) in
+
+  \[ f^\prime(x) = A f(x) + B f(x+h) + C f(x+2h) + D f(x + 3h) + E f(x + 4h)
+  \mathrm{.} \label{f5_1} \]
+
+  Applying Taylor series to the right-hand-side of [\(\ref{f5_1}\)] gives
+
+  \begin{align}
+
+  f^\prime(x) = & A f(x) + \nonumber \\
+                & B \left[ f(x) +
+                           h f^1(x) +
+                           \frac{h^2}{2} f^2(x) +
+                           \frac{h^3}{6} f^3(x) +
+                           \frac{h^4}{24} f^4(x) +
+                           \dots
+                    \right] + \nonumber \\
+                & C \left[ f(x) + 2 h f^1(x) +
+                           2 h^2 f^2(x) +
+                           \frac{4 h^3}{3} f^3(x) +
+                           \frac{2 h^4}{3} f^4(x) +
+                           \dots
+                    \right] + \nonumber \\
+                & D \left[ f(x) + 3 h f^1(x) +
+                           \frac{9 h^2}{2} f^2(x) +
+                           \frac{9 h^3}{2} f^3(x) +
+                           \frac{27 h^4}{8} f^4(x) +
+                           \dots
+                    \right] + \nonumber \\
+                & E \left[ f(x) + 4 h f^1(x) +
+                           8 h^2 f^2(x) +
+                           \frac{32 h^3}{3} f^3(x) +
+                           \frac{32 h^4}{3} f^4(x) +
+                           \dots
+                           \right] \mathrm{.} \\
+  \end{align}
+
+
+  Requiring that the coefficient of the terms of each derivative of \(f(x)\) be zero
+  gives us
+ 
+  \begin{align}
+          0           = & A + B + C + D + E \nonumber \\
+          \frac{1}{h} = & 0 + B + 2 C + 3 D + 4 E \nonumber \\
+          0 =           & 0 + B + 4 C + 9 D + 16 E \nonumber \\
+          0 =           & 0 + B + 8 C + 27 D + 64 E \nonumber \\
+          0 =           & 0 + B + 16 C + 81 D + 256 E \mathrm{.}\\
+  \end{align}
+
+  Using axiom one-liner
+
+  <pre>
+    m := matrix([[1,1,1,1,1],[0,1,2,3,4],[0,1,4,9,16],[0,1,8,27,64],[0,1,16,81,256]])
+    inverse(m)*vector([0,1/h,0,0,0]) 
+  </pre>
+
+  we get
+
+  \[ A = - \frac{25}{12 h} \quad B = \frac{4}{h} \quad C = - \frac{3}{h}
+  \quad D = \frac{4}{3 h} \] \quad E = - \frac{1}{4 h}
+
+  giving the 5 point forward differencing derivative approximation:
+
+  \[ f^\prime(x) = - \frac{25}{12 h} f(x) + \frac{4}{h} f(x + h)
+                   - \frac{3}{h} f(x + 2 h) + \frac{4}{3 h} f(x + 3 h)
+                   - \frac{1}{4 h} f(x + 4 h)
+                   \mathrm{.} \label{f5_r}
+  \]
+
+  Testing with general forth order polynomial function,
+  
+  \[ f(x) = a x^4 + b x^3 + c x^2 + d x + e \]
+
+  using axiom code to avoid using lots of paper,
+
+  <pre>
+    function(a * x**4 + b * x**3 + c * x**2 + d * x + e, f, x)
+    function(-25*f(x)/(12*h)+4*f(x+h)/h-3*f(x+2*h)/h+4*f(x+3*h)/(3*h)-f(x+4*h)/(4*h), fprime, x)
+    fprime(x)
+  </pre>
+
+  gives,
+
+  \[ f^\prime(x) = 4 a x^3 + 3 b x^2 + 2 c x + d \mathrm{,}\]
+
+  so we see it works perfectly for \(f(x)\) being any forth order polynomials in \(x\).
+  </p>
+
+
+
+  <h3>Derivative Back 2 Points</h3>
+
+  <p>
+  This time we will evaluate \(f(x)\) at 2 points using
+
+  \[ f^\prime(x) = A f(x - h) + B f(x) \mathrm{,}\]
+
+  but this is just [\(\ref{df2_1}\)] with 
+  \(h \to - h\), so with [\(\ref{f2_result}\)] we have
+
+   \[ f^\prime(x) = \frac{f(x) - f(x - h)}{h} \mathrm{.} \]
+
+  </p>
+
+
+  <h3>Derivative Back 3 Points</h3>
+
+  <p>
+  From [\ref{f3_form}] with \(h \to - h\) we get
+
+  \[
+      f^\prime(x) = \frac{ 3 f(x) - 4 f(x - h) + f(x - 2h)}{2 h}
+        \mathrm{.}
+  \]
+  </p>
+
+  <h3>Derivative Back 4 Points</h3>
+
+  <p>
+
+  From  [\(\ref{f4_r}\)] with \(h \to -h\) we get
+
+  \[
+      f^\prime(x) =  \frac{11}{6 h} f(x) - \frac{3}{h} f(x - h) +
+                   \frac{3}{2 h} f(x - 2 h) - \frac{1}{3 h} f(x - 3 h)
+                   \mathrm{.} 
+  \]
+  </p>
+
+  <h3>Derivative Centered 3 Points</h3>
+
+  <p>
+
+  We want the constants \(A\), \(B\), and \(C\) such that
+
+  \[
+  f^\prime(x) = A f(x - h) + B f(x) + C f(x + h) \mathrm{.} \label{c3_1}
+  \]
+
+  We start with the Taylor series expanding the right hand side of
+  [\(\ref{c3_1}\)] giving
+
+  \begin{align}
+  f^\prime(x) = & A \left[ f(x) - h f^\prime(x) + \frac{h^2}{2}
+                            f^{\prime\prime}(x) + \dots
+                \right] + \nonumber \\
+                & B \left[ f(x) \right] + \nonumber \\
+                & C  \left[ f(x) + h f^\prime(x) + \frac{h^2}{2}
+                            f^{\prime\prime}(x) + \dots
+                            \right] \mathrm{.}\\
+  \end{align}
+
+  Requiring that the coefficients of the terms of each derivative of \(f(x)\)
+  be zero gives
+
+  \begin{align}
+    0 = & A + B + C \nonumber \\
+    \frac{1}{h} = & - A + 0 B + C \nonumber \\
+    0 = & A + 0B + C \mathrm{.} \label{c3_3} \\
+  \end{align}
+
+  Using axiom to solve,
+
+  <pre>
+    inverse(matrix([[1,1,1],[-1,0,1],[1,0,1]]))*vector([0,1/h,0])
+  </pre>
+
+  or by inspection we have
+
+  \[ A = - \frac{1}{2 h} \quad B = 0 \quad C = \frac{1}{2 h} \]
+
+  giving
+
+  \[ f^\prime(x) = \frac{ f(x + h) - f(x - h)}{ 2 h } \]
+  </p>
+
+
+  <h3>Derivative 4 Points, Forward 1 From Center</h3>
+
+  <p>
+  
+  \[ f^\prime(x) = A f(x - h) + B f(x) + C f(x + h) + D f(x + 2h) \]
+
+  \begin{align}
+  f^\prime(x) = & A \left[ f(x) - h f^\prime(x) +
+                            \frac{h^2}{2} f^{\prime\prime}(x) -
+                            \frac{h^3}{6} f^{\prime\prime\prime}(x) +
+                            \dots
+                \right] + \nonumber \\
+                & B \left[ f(x) \right] + \nonumber \\
+                & C  \left[ f(x) +
+                            h f^\prime(x) +
+                            \frac{h^2}{2} f^{\prime\prime}(x) +
+                            \frac{h^3}{6} f^{\prime\prime\prime}(x) +
+                            \dots
+                            \right] + \nonumber \\
+                & D \left[ f(x) + 2 h f^\prime(x) +
+                            2 h^2 f^{\prime\prime}(x) +
+                            \frac{4 h^3}{3} f^{\prime\prime\prime}(x) +
+                            \dots
+                            \right] \\
+  \end{align}
+
+  \begin{align}
+               0 = & A + B + C + D \nonumber \\
+     \frac{1}{h} = & - A + 0 B + C + 2 D \nonumber \\
+               0 = & A + 0 B + C + 4 D \nonumber \\
+               0 = & -A + 0B + C + 8 D \\
+  \end{align}
+
+  <pre>
+    inverse(matrix([[1,1,1,1],[-1,0,1,2],[1,0,1,4],[-1,0,1,8]]))*vector([0,1/h,0,0])
+  </pre>
+
+  \[
+  A = - \frac{1}{3 h} \quad B = - \frac{1}{2 h} \quad C = \frac{1}{h}
+        \quad D = - \frac{1}{6 h}
+  \]
+
+  \[
+     f^\prime(x) = - \frac{1}{3 h} f(x - h) - \frac{1}{2 h} f(x) +
+                   \frac{1}{h} f(x + h) - \frac{1}{6 h} f(x + 2 h)
+                   \label{f4+1_r}
+  \]
+
+  Testing
+
+  <pre>
+    function(a * x**3 + b * x**2 + c * x + d, f, x)
+    function(-f(x-h)/(3*h)-f(x)/(2*h)+f(x+h)/h-f(x+2*h)/(6*h), fprime, x)
+    fprime(x)
+  </pre>
+
+  gives
+
+  \[ f^\prime(x) = 3 a x^2 + 2 b x + c =
+    \frac{\mathrm{d}}{\mathrm{d}x} \left(ax^3+bx^2+cx+d\right)
+    \mathrm{,} \]
+
+  where of course we failed on the first try, which is why we need to do
+  this check.
+
+
+  </p>
+
+  <h3>Derivative 4 Points, Back 1 From Center</h3>
+
+  <p>
+
+    From [\(\ref{f4+1_r}\)] with \(h \to -h\) we get
+
+    \[
+       f^\prime(x) = + \frac{1}{3 h} f(x + h) + \frac{1}{2 h} f(x) -
+                   \frac{1}{h} f(x - h) + \frac{1}{6 h} f(x - 2 h)
+
+    \]
+
+  </p>
+
+
+
+
+  <h3>Derivative 5 Points, Centered</h3>
+
+
+  <p>
+  
+  \[
+     f^\prime(x) = A f(x - 2 h) + B f(x- h) +
+                   C f(x) + D f(x + h) + E f(x + 2 h)
+  \]
+
+
+  \begin{align}
+  f^\prime(x) = & A  \left[ f(x) - 2 h f^1(x) +
+                            2 h^2 f^2(x) -
+                            \frac{4 h^3}{3} f^3(x) +
+                            \frac{2 h^4}{3} f^4(x) -
+                            \dots
+                            \right] + \nonumber \\
+                & B \left[ f(x) - h f^1(x) +
+                            \frac{h^2}{2} f^2(x) -
+                            \frac{h^3}{6} f^3(x) +
+                            \frac{h^4}{24} f^4(x) -
+                            \dots
+                \right] + \nonumber \\
+                & C \left[ f(x) \right] + \nonumber \\
+                & D  \left[ f(x) +
+                            h f^1(x) +
+                            \frac{h^2}{2} f^2(x) +
+                            \frac{h^3}{6} f^3(x) +
+                            \frac{h^4}{24} f^4(x) +
+                            \dots
+                            \right] + \nonumber \\
+                & E \left[ f(x) + 2 h f^1(x) +
+                            2 h^2 f^2(x) +
+                            \frac{4 h^3}{3} f^3(x) +
+                            \frac{2 h^4}{3} f^4(x) +
+                            \dots
+                            \right] \\
+  \end{align}
+
+  where we switched to using \(f^n(x)\), \(n = 1, 2, 3, 4\), notation instead of the prime
+  notation for the derivatives.
+
+  \begin{align}
+               0 = &     A + B +   C + D +    E \nonumber \\
+     \frac{1}{h} = & - 2 A - B + 0 C + D +  2 E \nonumber \\
+               0 = &   4 A + B + 0 C + D +  4 E \nonumber \\
+               0 = & - 8 A - B + 0 C + D +  8 E \nonumber \\
+               0 = &  16 A + B + 0 C + D + 16 E \\
+  \end{align}
+
+  <pre>
+    inverse(matrix([[1,1,1,1,1],[-2,-1,0,1,2],[4,1,0,1,4],[-8,-1,0,1,8],[16,1,0,1,16]]))*vector([0,1/h,0,0,0])
+  </pre>
+
+  \[
+       A =  \frac{1}{12 h} \quad B = - \frac{2}{3 h} \quad C = 0
+       \quad D = \frac{2}{3 h} \quad E = - \frac{1}{12 h}
+  \]
+
+  \[
+     f^\prime(x) = \frac{1}{12 h} f(x - 2 h) - \frac{2}{3 h} f(x - h) +
+                   \frac{2}{3 h} f(x + h) - \frac{1}{12 h} f(x + 2 h)
+  \]
+
+  Testing
+
+  <pre>
+    function(a * x**4 + b * x**3 + c * x**2 + d * x + e, f, x)
+    function(f(x-2*h)/(12*h)-2*f(x-h)/(3*h)+2*f(x+h)/(3*h)-f(x+2*h)/(12*h), fprime, x)
+    fprime(x)
+  </pre>
+
+  gives
+
+  \[ f^\prime(x) = 4 a x^3 + 3 b x^2 + 2 c x + d =
+      \frac{\mathrm{d}}{\mathrm{d}x}
+      \left(ax^4+bx^3+cx^2+dx+e\right)
+    \mathrm{.} \]
+
+  </p>
+
+
+  <h2>Higher Derivatives</h2>
+
+  <p>
+    If we think of the first derivative as being exact for some particular
+    order polynomial, applying the first derivative twice (or more) will
+    also be exact too, but with just a little more arithmetic round off
+    when compared to making a direct formula.
+  </p>
+
+  <p>
+    We need to be careful how we rely on values farther back and forward when
+    making higher derivatives.
+  </p>
+
+  
+  <h2>Application</h2>
+
+  <p>
+  Since our data is given at a fixed rate we don't need to worry about
+  dividing by zero.  We do however need to be concerned about gaps
+  in the data, which will look like steps in the function and
+  delta function like behavior in the derivative.  We start by just
+  looking and seeing.
+  </p>
+
+
+  <h3>References</h3>
+  http://www2.math.umd.edu/~dlevy/classes/amsc466/lecture-notes/differentiation-chap.pdf
+  </body>
+</html>

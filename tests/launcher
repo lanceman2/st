@@ -4,4 +4,4 @@ scriptdir="$(dirname ${BASH_SOURCE[0]})"
 
 export PATH="$scriptdir:$PATH"
 
-../bin/st_launcher launcher_list
+"$scriptdir"/../bin/st_launcher "$scriptdir"/launcher_list

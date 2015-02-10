@@ -1,13 +1,13 @@
 
 struct StSequence;
 
-
 extern
-struct StSequence *stSequence_create(size_t len, int dim);
+struct StSequence *stSequence_create(size_t len, int dof,
+    const char *fmt_labels, ...) ST__printf(3,4);
 extern
 StReal_t **stSequence_x(struct StSequence *s);
 
-/* Reads path of format (dim=2) like:
+/* Reads path of format (dof=2) like:
    x , y
    0.4 , 9.0
    0.2   12.0
@@ -15,13 +15,13 @@ StReal_t **stSequence_x(struct StSequence *s);
    ...
    etc
  */
-// use dim = 0 if dimension is unknown
+// use dof = 0 if number of degrees of freedom is unknown
 extern
-struct StSequence *stSequence_createFile(const char *path, int dim);
+struct StSequence *stSequence_createFile(const char *path, int dof);
 extern
 size_t stSequence_getLen(struct StSequence *v);
 extern
-int stSequence_getDim(struct StSequence *v);
+int stSequence_getDof(struct StSequence *v);
 extern
 void stSequence_destroy(struct StSequence *v);
 extern
@@ -29,4 +29,5 @@ void stSequence_print(struct StSequence *v, FILE *file);
 extern
 void stSequence_setLabel(struct StSequence *v, int dim,
     const char *fmt, ...) ST__printf(3,4);
-
+extern
+void stSequence_appendDeriv(struct StSequence *s, int *dims);

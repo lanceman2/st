@@ -12,14 +12,14 @@
 #include "sequence.h"
 
 
-int stSequence_getDim(struct StSequence *v)
+int stSequence_getDof(struct StSequence *v)
 {
   ASSERT(v);
   ASSERT(v->x);
   ASSERT(v->x[0]);
-  ASSERT(v->dim > 0);
+  ASSERT(v->dof > 0);
   ASSERT(v->len);
-  return v->dim;
+  return v->dof;
 }
 
 
@@ -28,7 +28,7 @@ size_t stSequence_getLen(struct StSequence *v)
   ASSERT(v);
   ASSERT(v->x);
   ASSERT(v->x[0]);
-  ASSERT(v->dim > 0);
+  ASSERT(v->dof > 0);
   ASSERT(v->len);
   return v->len;
 }
@@ -37,7 +37,7 @@ size_t stSequence_getLen(struct StSequence *v)
 static inline
 int getValueFromStr(char **str, StReal_t *val)
 {
-  char *s, *ptr = NULL;
+  char *s, *ptr = 0;
   s = *str;
   while(*s)
   {
@@ -57,52 +57,54 @@ StReal_t **stSequence_x(struct StSequence *v)
   ASSERT(v);
   ASSERT(v->x);
   ASSERT(v->x[0]);
-  ASSERT(v->dim > 0);
+  ASSERT(v->dof > 0);
   ASSERT(v->len);
   return v->x;
 }
 
-void stSequence_setLabel(struct StSequence *s, int dim,
+void stSequence_setLabel(struct StSequence *s, int dof,
     const char *fmt, ...)
 {
   ASSERT(s);
   ASSERT(s->x);
   ASSERT(s->x[0]);
-  ASSERT(s->dim > 0);
+  ASSERT(s->dof > 0);
   ASSERT(s->len);
-  ST_ASSERT(dim < s->dim);
-  ASSERT(s->label[dim]);
+  ST_ASSERT(dof < s->dof);
+  ASSERT(s->label[dof]);
 
-  free(s->label[dim]);
+  free(s->label[dof]);
 
-  char str[64];
+  const size_t LL = 64;
+  char str[LL]; // We limit the label length
   va_list ap;
   va_start(ap, fmt);
-  ST_ASSERT(vsnprintf(str, 64, fmt, ap) >= 0);
+  ST_ASSERT(vsnprintf(str, LL, fmt, ap) >= 0);
   va_end(ap);
-  s->label[dim] = strdup(str);
+  s->label[dof] = strdup(str);
 }
 
-void _stSequence_appendDim(struct StSequence *s, const char *labelFmt, ...)
+void _stSequence_appendDof(struct StSequence *s, const char *labelFmt, ...)
 {
   ASSERT(s);
   ASSERT(s->x);
   ASSERT(s->x[0]);
-  ASSERT(s->dim > 0);
+  ASSERT(s->dof > 0);
   ASSERT(s->len);
-  s->x = realloc(s->x, sizeof(StReal_t *)*(s->dim+1));
+  s->x = realloc(s->x, sizeof(StReal_t *)*(s->dof+1));
   ST_ASSERT(s->x);
-  s->x[s->dim] = malloc(sizeof(StReal_t)*s->bufLen);
-  ST_ASSERT(s->x[s->dim]);
+  s->x[s->dof] = malloc(sizeof(StReal_t)*s->len);
+  ST_ASSERT(s->x[s->dof]);
   
-  s->label = realloc(s->label, sizeof(char **)*(s->dim+2));
-  s->label[s->dim+1] = NULL;
+  s->label = realloc(s->label, sizeof(char **)*(s->dof+2));
+  s->label[s->dof+1] = 0;
 
   if(!labelFmt || !labelFmt[0])
   {
-    char str[8];
-    ST_ASSERT(snprintf(str, 8, "x%d", s->dim) > 0);
-    s->label[s->dim] = strdup(str);
+    char str[16];
+    ST_ASSERT(snprintf(str, 16, "x%d", s->dof) > 0);
+    s->label[s->dof] = strdup(str);
+    ST_ASSERT(s->label[s->dof]);
   }
   else
   {
@@ -111,45 +113,104 @@ void _stSequence_appendDim(struct StSequence *s, const char *labelFmt, ...)
     va_start(ap, labelFmt);
     ST_ASSERT(vsnprintf(str, 64, labelFmt, ap) >= 0);
     va_end(ap);
-    s->label[s->dim] = strdup(str);
+    s->label[s->dof] = strdup(str);
+    ST_ASSERT(s->label[s->dof]);
   }
 
-  ++s->dim;
+  ++s->dof;
 }
 
-struct StSequence *stSequence_create(size_t len, int dim)
+struct StSequence *stSequence_create(size_t len, int dof, const char *fmt, ...)
 {
-  ASSERT(dim > 0);
+  ASSERT(dof > 0);
   ASSERT(len);
   StReal_t **x;
   char **label;
-  x = malloc(sizeof(*x)*dim);
+  x = malloc(sizeof(*x)*dof);
   ST_ASSERT(x);
-  label = malloc(sizeof(char*)*dim+1);
+  label = malloc(sizeof(char*)*dof+1);
   ST_ASSERT(label);
-  label[dim] = NULL;
-  int i;
-  for(i=0;i<dim;++i)
+  label[dof] = 0; // terminated
+  int n_labels = 0; // so far
+
+  if(fmt && fmt[0])
   {
-    char s[8];
+    size_t ll = 128;
+    char *l;
+    l = malloc(sizeof(char)*ll);
+    ST_ASSERT(l);
+    va_list ap;
+    va_start(ap, fmt);
+    size_t n;
+    n = vsnprintf(l, ll, fmt, ap);
+    ST_ASSERT(n >= 0);
+    va_end(ap);
+
+    while(n == ll)
+    {
+      l = realloc(l, sizeof(char)*(ll += 64));
+      ST_ASSERT(l);
+      va_start(ap, fmt);
+      n = vsnprintf(l, ll, fmt, ap);
+      ST_ASSERT(n >= 0);
+      va_end(ap);
+    } 
+
+    char *s;
+    s = l;
+    while(*s == ' ')
+      ++s;
+
+    while(*s)
+    {
+      char *end;
+      end = s;
+      while(*end && *end != ' ')
+        ++end;
+      if(*end)
+      {
+        *end = '\0';
+        ++end;
+        while(*end == ' ')
+          ++end;
+      }
+
+      label[n_labels++] = strdup(s);
+      if(n_labels == dof)
+        break;
+      s = end;
+    }
+
+    free(l);
+  }
+
+  for(;n_labels<dof;++n_labels)
+  {
+    // default labels
+    char s[16];
+    snprintf(s,16,"x%d", n_labels);
+    label[n_labels] = strdup(s);
+    ST_ASSERT(label[n_labels]);
+  }
+
+  int i;
+  for(i=0;i<dof;++i)
+  {
     x[i] = malloc(sizeof(StReal_t)*len);
     ST_ASSERT(x[i]);
-    snprintf(s,8,"x%d", i);
-    label[i] = strdup(s);
-    ST_ASSERT(label[i]);
   }
+
   struct StSequence *v;
   v = malloc(sizeof(*v));
   ST_ASSERT(x);
   v->x = x;
   v->len = len;
-  v->dim = dim;
-  v->bufLen = len;
+  v->dof = dof;
   v->label = label;
   return v;
 }
 
-struct StSequence *stSequence_createFile(const char *path, int dim)
+struct StSequence *stSequence_createFile(const char *path, int dof)
 {
   FILE *file;
   if(!path || !path[0] || (path[0] == '-' && path[1] == '\0'))
@@ -157,12 +218,12 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
   else
     ST_ASSERT(file = fopen(path, "r"));
 
-  if(dim < 0)
-    dim = 0;
+  if(dof < 0)
+    dof = 0;
 
   int d = 0;
-  char *line = NULL;
-  StReal_t **x = NULL;
+  char *line = 0;
+  StReal_t **x = 0;
   size_t lineNum = 0, len = 0, n = 0;
 
   while(getline(&line, &n, file) != -1)
@@ -190,12 +251,12 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
     }
   }
   ST_VASSERT(len, "file: %s no sequence data found\n", path);
-  if(dim)
-    ST_VASSERT(d == dim,
+  if(dof)
+    ST_VASSERT(d == dof,
           "file: %s bad data at line number %zu has %d values not %d\n",
-          path, lineNum, d, dim);
+          path, lineNum, d, dof);
   else
-    dim = d;
+    dof = d;
 
   size_t bufLen = 1;
 
@@ -218,15 +279,15 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
       {
         int i;
         bufLen += 32;
-        for(i=0;i<dim;++i)
+        for(i=0;i<dof;++i)
         {
           x[i] = realloc(x[i], sizeof(StReal_t)*bufLen);
           ST_ASSERT(x[i]);
         }
       }
-      ST_VASSERT(d < dim,
+      ST_VASSERT(d < dof,
           "file: %s bad data at line number %zu has %d (or more) values not %d\n",
-          path, lineNum, d+1, dim);
+          path, lineNum, d+1, dof);
 
       x[d++][len] = val;
 
@@ -234,11 +295,23 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
     if(d)
     {
       ++len;
-      ST_VASSERT(d == dim,
+      ST_VASSERT(d == dof,
           "file: %s bad data at line number %zu has %d values not %d\n",
-          path, lineNum, d, dim);
+          path, lineNum, d, dof);
     }
   }
+
+  if(bufLen != len)
+  {
+    // remove the extra allocation in the arrays
+    int i;
+    for(i=0;i<dof;++i)
+    {
+      x[i] = realloc(x[i], sizeof(StReal_t)*len);
+      ST_ASSERT(x[i]);
+    }
+  }
+
 
   if(path && path[0] && (path[0] != '-' || path[1] != '\0'))
     fclose(file);
@@ -247,9 +320,11 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
     free(line);
 
   char **label;
-  label = malloc(sizeof(*label)*(dim+1));
+  label = malloc(sizeof(*label)*(dof+1));
   ST_ASSERT(label);
-  for(d=0;d<dim;++d)
+  label[dof] = 0;
+
+  for(d=0;d<dof;++d)
   {
     char s[8];
     snprintf(s,8,"x%d", d);
@@ -261,9 +336,9 @@ struct StSequence *stSequence_createFile(const char *path, int dim)
 
   ST_ASSERT(v = malloc(sizeof(*v)));
   v->x = x;
-  v->dim = dim; // dim = 1, 2, 3 as in 1D, 2D ...
-  v->len = len; // number of dimD points
-  v->bufLen = bufLen;
+  v->label = label;
+  v->dof = dof; // dof = 1, 2, 3 as in 1D, 2D ...
+  v->len = len; // number of dofD points
   return v;
 }
 
@@ -271,26 +346,26 @@ void stSequence_print(struct StSequence *v, FILE *file)
 {
   ASSERT(v);
   ASSERT(v->x);
-  ASSERT(v->dim > 0);
+  ASSERT(v->dof > 0);
   ASSERT(v->len);
   ASSERT(v->label);
   ASSERT(file);
 
   size_t i, len;
-  int dim, j;
+  int dof, j;
   StReal_t **x;
   len = v->len;
-  dim = v->dim;
+  dof = v->dof;
   x = v->x;
 
   fprintf(file, "%s", v->label[0]);
-  for(j=1; j<dim; ++j)
+  for(j=1; j<dof; ++j)
     fprintf(file, " %s", v->label[j]);
   fprintf(file, "\n");
 
   for(i=0; i<len; ++i)
   {
-    for(j=0; j<dim; ++j)
+    for(j=0; j<dof; ++j)
       fprintf(file, FMT " ", x[j][i]);
     fprintf(file, "\n");
   }
@@ -300,25 +375,25 @@ void stSequence_destroy(struct StSequence *v)
 {
   ASSERT(v);
   ASSERT(v->x);
-  ASSERT(v->dim);
+  ASSERT(v->dof);
   ASSERT(v->len);
   ASSERT(v->label);
   int i;
 #ifdef DEBUG
-  for(i=0;i<v->dim;++i)
+  for(i=0;i<v->dof;++i)
   {
-    memset(v->x[i], 0, v->bufLen*sizeof(StReal_t));
+    memset(v->x[i], 0, v->len*sizeof(StReal_t));
     ASSERT(v->label[i]);
   }
 #endif
-  for(i=0;i<v->dim;++i)
+  for(i=0;i<v->dof;++i)
   {
     free(v->x[i]);
     free(v->label[i]);
   }
 #ifdef DEBUG
-  memset(v->x, 0, sizeof(StReal_t*)*v->dim);
-  memset(v->label, 0, sizeof(char*)*(v->dim+1));
+  memset(v->x, 0, sizeof(StReal_t*)*v->dof);
+  memset(v->label, 0, sizeof(char*)*(v->dof+1));
 #endif
   free(v->x);
   free(v->label);
