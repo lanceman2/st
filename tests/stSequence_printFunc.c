@@ -1,17 +1,23 @@
 #include "../libst/st.h"
 
 static
-const size_t N = 1000;
+const size_t N = 100;
+static
+StReal_t n;
 
 static inline
 StReal_t func(size_t i)
 {
-  return (i - 500.0) * (i - 500.0) * 0.03;  
+  StReal_t d;
+  d = i/n - 1;
+  return d*d*d;  
 }
 
 
 int main(int argc, char **argv)
 {
+  n = N/2.0;
+
   if(argc > 1)
   {
     printf("Usage: %s [-h|--help]\n"

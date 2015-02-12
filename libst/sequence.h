@@ -4,6 +4,7 @@
 //
 // A vector sequence.
 
+
 struct StSequence
 {
   // channels are not interlaced
@@ -16,5 +17,5 @@ struct StSequence
 
 
 extern
-void _stSequence_appendDim(struct StSequence *s,
+void _stSequence_appendDof(struct StSequence *s,
     const char *labelFmt, ...) ST__printf(2,3);

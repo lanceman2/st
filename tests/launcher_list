@@ -1,6 +1,6 @@
 hello
 debug
 # TODO replace this file with program that spews
-stSequence_readStdin < xxx.csv | quickplot -L -
-stSequence_printFunc | quickplot -L -
+stSequence_readStdin < xxx.csv | quickplot -l -L -
+stSequence_printFunc | quickplot -l -L -
 

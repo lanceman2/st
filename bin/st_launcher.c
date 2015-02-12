@@ -48,7 +48,7 @@ static void setPathEnv(void)
   newPath = g_strdup_printf("%s:%s", path, envPath);
 
   setenv("PATH", newPath, 1);
-  //fprintf(stderr, "set PATH=\"%s\"\n", newPath);
+fprintf(stderr, "set PATH=\"%s\"\n", newPath);
 
   g_free(newPath);
 
