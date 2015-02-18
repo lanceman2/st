@@ -63,8 +63,17 @@ Put *quickbuild* in you PATH.
 
 ### open-axiom
 
+open-axiom is used to generate some of the C code.
+It is used to compute coefficients for taking derivatives
+numerically and other C code.
+
   >```sudo apt-get install open-axiom```
+
 
 # Development Notes
 
 - <a href="doc/differentiation.html">differentiation</a>
+
+# st Homepage
+
+https://github.com/lanceman2/st
