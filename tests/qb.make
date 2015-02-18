@@ -7,4 +7,5 @@ debug_ADD_PKG := glib-2.0
 
 stSequence_readStdin_LIBADD := ../libst/libst.so
 stSequence_printFunc_LIBADD := ../libst/libst.so
+stSequence_printFunc_LDFLAGS := -lm
 

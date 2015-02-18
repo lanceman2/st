@@ -8,9 +8,15 @@
 #  define VASSERT(x, fmt, ...) \
                                  st_assert(__FILE__, __LINE__, __func__,\
                                  (x), #x, fmt, ##__VA_ARGS__)
+#  define SPEW(fmt, ...) \
+                                 st_spew(__FILE__, __LINE__, __func__,\
+                                 fmt, ##__VA_ARGS__)
+
+
 #else
 
 #  define ASSERT(x)              /* empty macro */
 #  define VASSERT(x, fmt, ...)   /* empty macro */
+#  define SPEW(fmt, ...)         /* empty macro */
 
 #endif // #if @debug@ == 1

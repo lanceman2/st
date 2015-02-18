@@ -62,6 +62,19 @@ StReal_t **stSequence_x(struct StSequence *v)
   return v->x;
 }
 
+const char *stSequence_getLabel(const struct StSequence *s, int dof)
+{
+  ASSERT(s);
+  ASSERT(s->x);
+  ASSERT(s->x[0]);
+  ASSERT(s->dof > 0);
+  ASSERT(s->len);
+  ST_ASSERT(dof < s->dof);
+  ASSERT(s->label[dof]);
+
+  return s->label[dof];
+}
+
 void stSequence_setLabel(struct StSequence *s, int dof,
     const char *fmt, ...)
 {

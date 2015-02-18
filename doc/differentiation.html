@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang=en>
   <head>
+    <style>
+      body { background-color: #88C; }
+      pre { background-color: #AAC; }
+    </style>
     <meta charset="UTF-8"> 
     <title>Numerical Differentiation</title>
     <!-- EDIT this MathJax file path -->
@@ -295,8 +299,8 @@
   Using axiom one-liner
 
   <pre>
-    inverse(matrix([[1,1,1,1],[0,1,2,3],[0,1,4,9],[0,1,8,27]]))*vector([0,1/h,0,0]) 
-  </pre>
+  m := matrix([[1,1,1,1],[0,1,2,3],[0,1,4,9],[0,1,8,27]])
+  inverse(m)*vector([0,1/h,0,0])</pre>
 
   we get
 
@@ -317,10 +321,9 @@
   using axiom code to avoid using lots of paper,
 
   <pre>
-    function(a * x**3 + b * x**2 + c * x + d, f, x)
-    function(-11*f(x)/(6*h)+3*f(x+h)/h-3*f(x+2*h)/(2*h)+f(x+3*h)/(3*h), fprime, x)
-    fprime(x)
-  </pre>
+  function(a * x**3 + b * x**2 + c * x + d, f, x)
+  function(-11*f(x)/(6*h)+3*f(x+h)/h-3*f(x+2*h)/(2*h)+f(x+3*h)/(3*h), fprime, x)
+  fprime(x)</pre>
 
   gives,
 
@@ -386,14 +389,13 @@
   Using axiom one-liner
 
   <pre>
-    m := matrix([[1,1,1,1,1],[0,1,2,3,4],[0,1,4,9,16],[0,1,8,27,64],[0,1,16,81,256]])
-    inverse(m)*vector([0,1/h,0,0,0]) 
-  </pre>
+  m := matrix([[1,1,1,1,1],[0,1,2,3,4],[0,1,4,9,16],[0,1,8,27,64],[0,1,16,81,256]])
+  inverse(m)*vector([0,1/h,0,0,0])</pre>
 
   we get
 
   \[ A = - \frac{25}{12 h} \quad B = \frac{4}{h} \quad C = - \frac{3}{h}
-  \quad D = \frac{4}{3 h} \quad E = - \frac{1}{4 h}
+  \quad D = \frac{4}{3 h} \quad E = - \frac{1}{4 h} \label{df5_cof}
   \]
 
   giving the 5 point forward differencing derivative approximation:
@@ -411,10 +413,9 @@
   using axiom code to avoid using lots of paper,
 
   <pre>
-    function(a * x**4 + b * x**3 + c * x**2 + d * x + e, f, x)
-    function(-25*f(x)/(12*h)+4*f(x+h)/h-3*f(x+2*h)/h+4*f(x+3*h)/(3*h)-f(x+4*h)/(4*h), fprime, x)
-    fprime(x)
-  </pre>
+  function(a * x**4 + b * x**3 + c * x**2 + d * x + e, f, x)
+  function(-25*f(x)/(12*h)+4*f(x+h)/h-3*f(x+2*h)/h+4*f(x+3*h)/(3*h)-f(x+4*h)/(4*h), fprime, x)
+  fprime(x)</pre>
 
   gives,
 
@@ -499,8 +500,7 @@
   Using axiom to solve,
 
   <pre>
-    inverse(matrix([[1,1,1],[-1,0,1],[1,0,1]]))*vector([0,1/h,0])
-  </pre>
+  inverse(matrix([[1,1,1],[-1,0,1],[1,0,1]]))*vector([0,1/h,0])</pre>
 
   or by inspection we have
 
@@ -546,8 +546,7 @@
   \end{align}
 
   <pre>
-    inverse(matrix([[1,1,1,1],[-1,0,1,2],[1,0,1,4],[-1,0,1,8]]))*vector([0,1/h,0,0])
-  </pre>
+  inverse(matrix([[1,1,1,1],[-1,0,1,2],[1,0,1,4],[-1,0,1,8]]))*vector([0,1/h,0,0])</pre>
 
   \[
   A = - \frac{1}{3 h} \quad B = - \frac{1}{2 h} \quad C = \frac{1}{h}
@@ -563,10 +562,9 @@
   Testing
 
   <pre>
-    function(a * x**3 + b * x**2 + c * x + d, f, x)
-    function(-f(x-h)/(3*h)-f(x)/(2*h)+f(x+h)/h-f(x+2*h)/(6*h), fprime, x)
-    fprime(x)
-  </pre>
+  function(a * x**3 + b * x**2 + c * x + d, f, x)
+  function(-f(x-h)/(3*h)-f(x)/(2*h)+f(x+h)/h-f(x+2*h)/(6*h), fprime, x)
+  fprime(x)</pre>
 
   gives
 
@@ -649,8 +647,8 @@
   \end{align}
 
   <pre>
-    inverse(matrix([[1,1,1,1,1],[-2,-1,0,1,2],[4,1,0,1,4],[-8,-1,0,1,8],[16,1,0,1,16]]))*vector([0,1/h,0,0,0])
-  </pre>
+  m := matrix([[1,1,1,1,1],[-2,-1,0,1,2],[4,1,0,1,4],[-8,-1,0,1,8],[16,1,0,1,16]])
+  inverse(m)*vector([0,1/h,0,0,0])</pre>
 
   \[
        A =  \frac{1}{12 h} \quad B = - \frac{2}{3 h} \quad C = 0
@@ -660,15 +658,15 @@
   \[
      f^\prime(x) = \frac{1}{12 h} f(x - 2 h) - \frac{2}{3 h} f(x - h) +
                    \frac{2}{3 h} f(x + h) - \frac{1}{12 h} f(x + 2 h)
+                   \label{dc5_result}
   \]
 
   Testing
 
   <pre>
-    function(a * x**4 + b * x**3 + c * x**2 + d * x + e, f, x)
-    function(f(x-2*h)/(12*h)-2*f(x-h)/(3*h)+2*f(x+h)/(3*h)-f(x+2*h)/(12*h), fprime, x)
-    fprime(x)
-  </pre>
+  function(a * x**4 + b * x**3 + c * x**2 + d * x + e, f, x)
+  function(f(x-2*h)/(12*h)-2*f(x-h)/(3*h)+2*f(x+h)/(3*h)-f(x+2*h)/(12*h), fprime, x)
+  fprime(x)</pre>
 
   gives
 
@@ -704,6 +702,378 @@
   delta function like behavior in the derivative.  We start by just
   looking and seeing.
   </p>
+
+  <p>
+  We looked and saw what looks like:
+  </p>
+     <ul>
+       <li>We are over-fitting the data.  It needs a lower order polynomial fit
+         to remove some of the giggling that we clearly don't want.  We'll
+       need to use linear regression to find the polynomial.</li>
+       <li>We need to reduce the effect of data as the dependent variable
+       (time) is farther away from the point we are getting a derivative
+       for.  That may be automatic given the nature of polynomial
+       functions.  If we used sines and cosines as basis functions than
+       we'd have a problem with far away (in time) values effecting
+       current values.</li>
+    </ul>
+
+
+    <h2>Differentiation Using Least Squares Fit Polynomials</h2>
+
+
+    <p>
+    First we change variables to scaled (dimensionless) variables
+    defined by
+    
+    \[
+       \chi \equiv \frac{x - \delta}{h}
+    \]
+
+    where \(\delta\) is the value of \(x\) where we will get the
+    derivative of \(f(x)\) with respect to \(x\) and \(h\) is the
+    constant change in \(x\) between samples due to the constant
+    sample rate.  So in the scaled
+    variable \(\chi\) the difference between samples is 1 and we
+    will compute the derivative at \(\chi\) equals zero.  So
+    for convenience we define the function \(F(\chi)\) by
+
+    \[
+    F(\chi) \equiv f(\delta + h \chi) \mathrm{.}
+    \]
+
+    So
+
+    \[
+       \frac{\mathrm{d}}{\mathrm{d}x} f(x) =
+       \frac{1}{h} \frac{\mathrm{d}}{\mathrm{d} \chi}
+       F(\chi) \mathrm{.}
+    \]
+
+    </p>
+
+    <p>
+      We seek a polynomial function of the form
+
+      \begin{align}
+          \Psi_\theta(\chi) = & \theta_0 + \theta_1 \chi + \theta_2 \chi^2 + \theta_3
+                         \chi^3 + \dots + \theta_n \chi^n \nonumber \\
+                      = & \sum_{j=0}^n \theta_j \chi^n \\
+      \end{align}
+
+      so the first derivative of \(f(x)\) at \(\chi = 0\) is
+      \(\frac{\theta_1}{h}\) and we see that higher derivatives
+      are easy to get giving the \(p\)-th derivative as at \(x\)
+      equal to zero as
+
+      \[
+        \left. \frac{\mathrm{d}}{\mathrm{d} x} f(x) \right|_{x=0} =
+        \frac{\theta_p}{h^p} \label{psi_eq_F}
+      \]
+
+
+      We call \(\Psi_\theta(\chi)\) the fit function which is defined
+      by a given set of \(\theta_j\) values for \(j = 0,1,2,\dots\,n\).
+      If the fit is perfect than
+      \[
+          \Psi_\theta(\chi) = F(\chi) \mathrm{.}
+      \]
+      We will have many values of \(\chi\) so we mark each one
+      with a subscript, so we switch to referring to \(\chi_j\) as
+      the \(j\)-th value of variable \(\chi\) and from here out
+      refer to \(\chi\) as a vector with \(m\) values.
+
+      We wish to find the value of the vector \(\theta\) which
+      makes [\(\ref{psi_eq_F}\)] for \(m = n + 1\), or if \(m \gt n + 1\) minimize
+      \[
+      \sum_{j=1}^m \left[\Psi_\theta(\chi_j) - F(\chi_j)\right]^2  \mathrm{.}
+      \]
+
+
+      We define the matrix of column vectors like so
+
+      \[
+           X = 
+           \left[
+              \begin{array}{cc}
+                  \chi_1^0 & \chi_1^1 & \chi_1^2 & \chi_1^3 & \dots & \chi_1^n \\
+                  \chi_2^0 & \chi_2^1 & \chi_2^2 & \chi_2^3 & \dots & \chi_2^n \\
+                  \chi_3^0 & \chi_3^1 & \chi_3^2 & \chi_3^3 & \dots & \chi_3^n \\
+                  \chi_4^0 & \chi_4^1 & \chi_4^2 & \chi_4^3 & \dots & \chi_4^n \\
+                  \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+                  \chi_m^0 & \chi_m^1 & \chi_m^2 & \chi_m^3 & \dots & \chi_m^n
+              \end{array}
+           \right]
+        \]
+          
+        where we have \(m\) samples, and \(\chi_j\) where \(j =
+        1,2,3,\dots,m\) are particular \(\chi\) values so that
+
+        \[
+        X \, \left[ \begin{array}{c} \theta_0 \\ \theta_1 \\ \theta_2 \\
+                                  \theta_3 \\ \vdots \\ \theta_n
+                  \end{array}
+          \right] \equiv X \, \theta
+          =
+          \left[ \begin{array}{c}
+              \Psi_\theta(\chi_1) \\
+              \Psi_\theta(\chi_2) \\
+              \Psi_\theta(\chi_3) \\
+              \Psi_\theta(\chi_4) \\
+              \vdots \\
+              \Psi_\theta(\chi_m) \\
+               \end{array}
+          \right]
+          \equiv
+          \Psi_\theta(\chi) \mathrm{,}
+        \]
+
+        is column vector of \(\Psi_\theta(\chi)\) values with vector \(\chi\) values
+        \(\chi_1\), \(\chi_2\), \(\chi_3\) and so on.
+
+
+        So by using <a
+    href="http://en.wikipedia.org/wiki/Linear_least_squares_%28mathematics%29">linear
+       least squares</a> the \(\theta\) vector can be solved as
+
+      \[
+      \theta = \left(X^T X\right)^{-1} X^T F(\chi) \, \mathrm{,} \label{lls_X}
+      \]
+
+      where \(F(\chi)\) is a vector of values for the corresponding vector
+      function as in
+
+      \[
+            F(\chi) = \left[
+                 \begin{array}{c}
+                    F(\chi_1) \\
+                    F(\chi_2) \\
+                    F(\chi_3) \\
+                    F(\chi_4) \\
+                    \vdots \\
+                    F(\chi_m)
+                \end{array}
+                \right] \mathrm{.}
+      \]
+    </p>
+
+    <p>
+      This should give us the previous results that we got above for particular cases
+      that have \(m = n + 1\).  When \(m \gt n + 1\) we will be doing a
+      smoothing of the data by under-fitting it with a lower order
+      polynomial function, in effect removing squiggles.
+    </p>
+
+
+    <h3>Derivative Forward 2 Points by Least Squares Fit Polynomials</h3>
+
+    <p>
+    We wish to get [\(\ref{f2_result}\)] by way of [\(\ref{lls_X}\)] so we
+    have
+
+    \[
+        X = \left[
+           \begin{array}{cc}
+              1 & 0 \\
+              1 & 1 \\
+              \end{array}
+              \right]
+        \quad \mathrm{and} \quad
+        F(\chi) =
+          \left[
+          \begin{array}{c}
+            F(0) \\
+            F(1) \\
+          \end{array}
+            \right]
+      \]
+  
+    Using axiom
+  <pre>
+  m := matrix([[1,0],[1,1]])
+  t := transpose(m)
+  inverse(t * m) * t</pre>
+
+    gives
+
+    \[
+    \theta = \left[
+       \begin{array}{cc}
+          1 & 0\\
+          -1 & 1\\
+       \end{array}
+    \right]
+    \left[
+       \begin{array}{c}
+          F(0) \\
+          F(1) \\
+       \end{array}
+    \right]
+    =
+    \left[
+       \begin{array}{c}
+          F(0) \\
+          F(1) - F(0)\\
+       \end{array}
+    \right]
+    \]
+
+    so
+
+    \[
+        \theta_1 = F(1) - F(0) = f(\delta + h) - f(\delta)
+    \]
+
+    giving 
+
+    \[
+    f^\prime(\delta) = \frac{f(\delta + h) - f(\delta)}{h} \mathrm{.}
+    \]
+    which is the same as [\(\ref{f2_result}\)] with \(x \to \delta\).
+
+    </p>
+
+
+    <h3>Derivative Centered 5 Points by Least Squares Fit Polynomials</h3>
+
+    <p>
+       We wish to get [\(\ref{f2_result}\)] by way of [\(\ref{lls_X}\)] so we
+    have
+
+    \[
+        X = \left[
+           \begin{array}{cc}
+              1 & -2 & 4 & -8 & 16 \\
+              1 & -1 & 1 & -1 & 1 \\
+              1 & 0 &  0 & 0  & 0 \\
+              1 & 1 &  1 & 1  & 1 \\
+              1 & 2  & 4 & 8  & 16 \\
+              \end{array}
+              \right]
+        \quad \mathrm{and} \quad
+        F(\chi) =
+          \left[
+          \begin{array}{c}
+            F(-2) \\
+            F(-1) \\
+            F(0) \\
+            F(1) \\
+            F(2) \\
+          \end{array}
+            \right]
+      \]
+  
+    Using axiom
+  <pre>
+  m := matrix([[1,-2,4,-8,16],[1,-1,1,-1,1],[1,0,0,0,0],[1,1,1,1,1],[1,2,4,8,16]])
+  t := transpose(m)
+  inverse(t * m) * t</pre>
+
+    gives a \(\theta_1\) with the same constant coefficients as in
+    [\(\ref{dc5_result}\)], oh boy what fun.
+    </p>
+
+    <p>
+    Now, unexpectedly, we have a fast way, using axiom (or other like
+    thing), to compute coefficients to calculate derivatives using a
+    polynomial function fitting.
+    </p>
+
+
+    <h3>Derivative 5 Points Forward</h3>
+
+     <p>
+    
+  <pre>
+  m := matrix([[1,0,0,0,0],[1,1,1,1,1],[1,2,4,8,16],[1,3,9,27,3*27],[1,4,16,4*16,16*16]])
+  t := transpose(m)
+  inverse(t * m) * t</pre>
+
+    Gives the same coefficients as in [\(\ref{df5_cof}\)] as we see in
+    the second row in the matrix below.
+  
+  <pre>
+        + 1     0     0    0    0 +
+        |                         |
+        |  25              4     1|
+        |- --   4    - 3   -   - -|
+        |  12              3     4|
+        |                         |
+        | 35     13  19     7  11 |
+        | --   - --  --   - -  -- |
+        | 24      3   4     3  24 |
+        |                         |
+        |   5   3          7     1|
+        |- --   -    - 2   -   - -|
+        |  12   2          6     4|
+        |                         |
+        |  1     1    1     1   1 |
+        | --   - -    -   - -  -- |
+        + 24     6    4     6  24 +</pre>
+
+
+
+     </p>
+
+
+    <h3>Derivative 6 Points Forward with \(x^4\) polynomial Fit</h3>
+
+
+     <p>
+    
+  <pre>
+  m := matrix([[1,0,0,0,0],[1,1,1,1,1],[1,2,4,8,16],_
+[1,3,9,27,3*27],[1,4,16,4*16,16*16],[1,5,25,125,25*25]])
+  t := transpose(m)
+  inverse(t * m) * t</pre>
+
+
+     gives a matrix of
+
+  <pre>
+    | 251      5       5     5       5     1  |
+    | ---     ---   - ---   ---   - ---   --- |
+    | 252     252     126   126     252   252 |
+    |                                         |
+    |  1375   506      67    248   811      50|
+    |- ----   ---   - ---  - ---   ---   - ---|
+    |   756   189     189    189   756     189|
+    |                                         |
+    | 155      349   67     107     209    55 |
+    | ---    - ---   --     ---   - ---   --- |
+    | 144      144   72      72     144   144 |
+    |                                         |
+    |   55    149      41     49   121      35|
+    |- ---    ---   - ---  - ---   ---   - ---|
+    |  216    216     108    108   216     216|
+    |                                         |
+    |   1       1     1      1       1     1  |
+    |  --    - --    --     --    - --    --  |
+    |  48      16    24     24      16    48  |</pre>
+
+     we note that the \(\theta_1\), 2nd, row looks reasonable.
+     </p>
+
+
+     <h3>Better Notation</h3>
+
+     <p>
+       There are three integer parameters of interest.  They are
+       the \(n\) the largest polynomial power as in \(x^n\),
+       \(m\) the number of \(f()\) function values used, and
+       by convention we order the component values of \(\chi\)
+       making \(\chi_1\) the lowest and \(\chi_m\) the highest.
+       So the integer triplet \(n, m, \chi_1\) are enough to
+       define a method to approximate a derivative (so far).
+       We may use this in the code.
+     </p>
+
+     <p>
+       See axiom file <a href="../libst/diff_coef.input">diff_coef.input</a>
+       which can generate
+       many derivative coefficients at one time.
+     </p>
+
 
 
   <h3>References</h3>

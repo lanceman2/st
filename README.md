@@ -7,7 +7,8 @@ st
 This is my personal general propose simulation toolkit.  C APIs
 (application programming interfaces) and some scripts.  Tools to write
 computer programs that run in operator-in-the-loop real-time or not.  It's
-just starting.
+just starting.  If anyone uses this code, Coool.  If not that's okay too.
+I still need it.
 
 
 
@@ -60,3 +61,10 @@ Put *quickbuild* in you PATH.
 + https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 + https://help.github.com/articles/github-flavored-markdown/
 
+### open-axiom
+
+  >```sudo apt-get install open-axiom```
+
+# Development Notes
+
+- <a href="doc/differentiation.html">differentiation</a>

@@ -1,0 +1,93 @@
+-- axiom code or open-axiom code
+
+-- Example:
+-- run% axiom -noht
+-- )read diff_coef
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+-- This calculates numbers for the code in ../libst/sequence_deriv.c
+--
+--
+-- Computing this by pencil and paper would be very time consuming.
+--
+-- We are trying to make this work with both axiom and open-axiom.
+-- open-axiom can be non-interactive and axiom appears to always be
+-- interactive.
+--
+-- axiom has shell history and open-axiom does not.
+-- Neither axiom or open-axiom seem to be very actively developed,
+-- to the extend like compared to the GTK+ software package.
+-- Both axiom or open-axiom seem to be very robust, but crude
+-- and under developed as an interrupted language.  They are old
+-- and work well.
+--
+-- TODO: maybe use a Lisp or C interface??
+---------------------------------------------------------------------
+---------------------------------------------------------------------
+
+
+)clear all
+
+
+-- class function name space diffCoef
+
+------------------------------------
+-- notes on dummy indexes
+-- n  := 3 -- x^n  polynomial order
+-- np1 := n + 1 -- number of \chi coefficients 0..n
+-- m  := 5 -- number of points to fit = number of \chi sets
+-- p  := 1 -- derivative: 0 for 0th, 1 for 1st, 2 for 2nd ... etc
+-- x is \chi: varies example for m=5:  -4 to 0, -3 to 1, ... 0 to 4
+------------------------------------
+
+-- newline or "\n" string
+nl == char(10)::String
+
+diffCoefMatCol : (Integer, PositiveInteger) -> List Integer
+diffCoefMatCol(x,n) == [ x**i for i in 0..n]
+
+diffCoefMat : (Integer, PositiveInteger, PositiveInteger) -> Matrix Integer
+diffCoefMat(a, m, n) == matrix([ diffCoefMatCol(x,n) for x in a..(a+m-1)])
+
+diffCoefStructName : (PositiveInteger, PositiveInteger, Integer) -> String
+diffCoefStructName(n, m, p) ==
+  "coef__" string(p) "deriv__" string(m) "pts__xpow" string(n)
+
+diffCoefHeader : (Integer, Integer, Integer) -> String
+diffCoefHeader(n, m, p) ==
+  nl _
+  "static const StReal__t " diffCoefStructName(n, m, p) "[] =" nl _
+  "{" nl _
+  "  /////////////////////////////////////////////////////////" nl _
+  "  //               " string(p) "-Derivative" nl _
+  "  //         polynomial x^" string(n) " fit" nl _
+  "  //          with " string(m) " points" nl _
+  "  /////////////////////////////////////////////////////////" nl nl
+
+-- solves for the \theta coefficient matrix
+diffCoefTheta : (Integer, PositiveInteger, PositiveInteger) -> Matrix(Fraction(Integer))
+diffCoefTheta(a, m, n) ==
+  M := diffCoefMat(a, m, n);
+  TT := transpose(M);
+  return (inverse(TT* M) * TT)
+
+-- This is a little inefficient in that we keep recalculating diffCoefTheta(a,m,n)
+-- for different p derivative values.
+diffCoefThetaCoef : (Integer, PositiveInteger, PositiveInteger, Integer) -> Vector(Fraction(Integer))
+diffCoefThetaCoef(a, m, n, p) == row(diffCoefTheta(a,m,n), p+1)
+
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--   Run diffCoefThetaCoef(-1,4,2,1) to get the coefficients, A, B,C, ...for
+--
+--         f^\prime(x) = A f(x - h) + B f(x) + C f(x + h) + D f(x + 2h)
+--
+--   which gives
+--
+--          A = -11/20  B = 3/20  C = 7/20  D = 1/20
+--
+------------------------------------------------------------------------------
+output("")
+
