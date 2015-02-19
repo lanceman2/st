@@ -12,24 +12,23 @@
 #include "sequence.h"
 
 
-// This code assumes that the sample rate is fixed at 1
-
-
 /* See file ../doc/differentiation.html for details:
  *
- * "Notes on Numerical Differentiation" for calculations of the
- * constants in the expressions below in sequence_deriv_coef.h
+ * "Notes on Numerical Differentiation" for calculations of the constants
+ * in the expressions below in the generated file sequence_deriv_coef.h
  *
  * We used axiom (open-axiom) to calculate them.
+ *
  */
+// This code assumes that the sample rate is fixed at 1 so h = 1.
+
 
 #include "sequence_deriv_coef.h"
 
 
 static inline void
 _deriv(StReal_t *out, const StReal_t *in,
-    const StReal_t *coef, int inc, int sign, int points,
-    StReal_t deriv_factor)
+    const StReal_t *coef, int inc, int sign, int points)
 {
   *out = 0;
   int i;
@@ -39,8 +38,6 @@ _deriv(StReal_t *out, const StReal_t *in,
 //SPEW("%g = %d*(in[%d]=%g)*(%g)\n", sign * in[i] * coef[inc * i],
   //  inc, inc * i, in[i], coef[inc * i]);
   }
-
-  *out *= deriv_factor; // from  p!
 
 //SPEW("val      =%g\n\n", *out);
 }
@@ -82,21 +79,18 @@ void stSequence_deriv(struct StSequence *s, int from, int to,
   StReal_t *in, *out;
   in = s->x[from];
   out = s->x[to];
-  StReal_t deriv_factor = 1;
  
   int i,n, sign = 1;
-  for(i=2;i<=deriv_num;++i)
-    deriv_factor *= i;
 
   n = (points-1)/2;
   for(i=0;i<n;++i)
   {
-    _deriv(out++, in, coef, 1, sign, points, deriv_factor);
+    _deriv(out++, in, coef, 1, sign, points);
     coef += points;
   }
   n = s->len - points/2;
   for(;i<n;++i)
-    _deriv(out++, in++, coef, 1, sign, points, deriv_factor);
+    _deriv(out++, in++, coef, 1, sign, points);
   n = s->len;
   if(points & 01)
     // odd number of points
@@ -112,7 +106,10 @@ void stSequence_deriv(struct StSequence *s, int from, int to,
   --in;
   for(;i<n;++i)
   {
-    _deriv(out++, in, coef, -1, sign, points, deriv_factor);
+    // We opted to use the matrix X symmetry and not have the whole matrix
+    // in the code.  So we go back to the upper rows in the matrix and
+    // change +/- factor and direction of access along the row.
+    _deriv(out++, in, coef, -1, sign, points);
     coef -= points;
   }
 }
