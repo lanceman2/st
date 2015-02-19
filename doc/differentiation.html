@@ -760,24 +760,28 @@
                          \chi^3 + \dots + \theta_n \chi^n \nonumber \\
                       = & \sum_{j=0}^n \theta_j \chi^n \\
       \end{align}
-
-      so the first derivative of \(f(x)\) at \(\chi = 0\) is
-      \(\frac{\theta_1}{h}\) and we see that higher derivatives
-      are easy to get giving the \(p\)-th derivative as at \(x\)
-      equal to zero as
-
-      \[
-        \left. \frac{\mathrm{d}}{\mathrm{d} x} f(x) \right|_{x=0} =
-        \frac{\theta_p}{h^p} \label{psi_eq_F}
-      \]
-
-
       We call \(\Psi_\theta(\chi)\) the fit function which is defined
       by a given set of \(\theta_j\) values for \(j = 0,1,2,\dots\,n\).
       If the fit is perfect than
       \[
           \Psi_\theta(\chi) = F(\chi) \mathrm{.}
       \]
+
+      If that is so the first derivative of \(f(x)\) at \(x = \delta\) is
+      \(\frac{\theta_1}{h}\) and we see that higher derivatives
+      are easy to get giving the \(p\)-th derivative at \(x\)
+      equal to \(\delta\) as
+
+      \[
+        \left. \frac{\mathrm{d}^p}{\mathrm{d}x^p} f(x) \right|_{x=\delta} =
+        \frac{p!}{h^p} \theta_p \label{psi_eq_F}
+      \]
+
+      If the fix is not exact than we give an approximation for
+      these derivatives.
+    </p>
+
+    <p>
       We will have many values of \(\chi\) so we mark each one
       with a subscript, so we switch to referring to \(\chi_j\) as
       the \(j\)-th value of variable \(\chi\) and from here out
@@ -793,7 +797,7 @@
       We define the matrix of column vectors like so
 
       \[
-           X = 
+           X \equiv
            \left[
               \begin{array}{cc}
                   \chi_1^0 & \chi_1^1 & \chi_1^2 & \chi_1^3 & \dots & \chi_1^n \\

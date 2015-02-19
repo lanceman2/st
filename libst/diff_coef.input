@@ -20,8 +20,6 @@
 -- Both axiom or open-axiom seem to be very robust, but crude
 -- and under developed as an interrupted language.  They are old
 -- and work well.
---
--- TODO: maybe use a Lisp or C interface??
 ---------------------------------------------------------------------
 ---------------------------------------------------------------------
 
@@ -74,6 +72,14 @@ diffCoefTheta(a, m, n) ==
 -- for different p derivative values.
 diffCoefThetaCoef : (Integer, PositiveInteger, PositiveInteger, Integer) -> Vector(Fraction(Integer))
 diffCoefThetaCoef(a, m, n, p) == row(diffCoefTheta(a,m,n), p+1)
+
+diffCoefCheck: (PositiveInteger, PositiveInteger, Integer) -> Boolean
+diffCoefCheck(n, m, p) ==
+  if m < (n + 1) then return false -- cannot fit x^3 with less than 4 points
+  -- cannot take 2nd derivative with less than 3 points
+  if m < (p + 1) then return false
+  if n < p then return false
+  return true
 
 
 ------------------------------------------------------------------------------
