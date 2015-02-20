@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html lang=en>
   <head>
-    <style>
-      body { background-color: #88C; }
-      pre { background-color: #AAC; }
-    </style>
     <meta charset="UTF-8"> 
+    <link rel="stylesheet" href="st.css">
     <title>Numerical Differentiation</title>
     <!-- EDIT this MathJax file path -->
     <script id=localjaxscript
@@ -739,8 +736,13 @@
     for convenience we define the function \(F(\chi)\) by
 
     \[
-    F(\chi) \equiv f(\delta + h \chi) \mathrm{.}
+    F(\chi) = f(x) = f(\delta + h \chi) \mathrm{.}
     \]
+
+    Like above, we are using \(f(x) = f(\delta + h \chi)\)
+    to refer to the actual data values.  \(F(\chi)\) has the
+    same values as \(f(x)\) but is a function of \(\chi\)
+    and not \(x\).
 
     So
 
@@ -760,12 +762,14 @@
                          \chi^3 + \dots + \theta_n \chi^n \nonumber \\
                       = & \sum_{j=0}^n \theta_j \chi^n \\
       \end{align}
+
       We call \(\Psi_\theta(\chi)\) the fit function which is defined
       by a given set of \(\theta_j\) values for \(j = 0,1,2,\dots\,n\).
       If the fit is perfect than
       \[
           \Psi_\theta(\chi) = F(\chi) \mathrm{.}
       \]
+
 
       If that is so the first derivative of \(f(x)\) at \(x = \delta\) is
       \(\frac{\theta_1}{h}\) and we see that higher derivatives
@@ -777,8 +781,13 @@
         \frac{p!}{h^p} \theta_p \label{psi_eq_F}
       \]
 
-      If the fix is not exact than we give an approximation for
-      these derivatives.
+      If the fit is not exact than we give an approximation for
+      these derivatives.  In our case with nosey data the
+      approximation will be construed as a smoothing of the data.
+      This smoothed fitting of the data can can even be useful for
+      taking the 0-th derivative while smoothing of the data, which
+      will just be a smoothing of the data by using polynomial
+      fitting.
     </p>
 
     <p>
@@ -836,9 +845,10 @@
         \(\chi_1\), \(\chi_2\), \(\chi_3\) and so on.
 
 
-        So by using <a
-    href="http://en.wikipedia.org/wiki/Linear_least_squares_%28mathematics%29">linear
-       least squares</a> the \(\theta\) vector can be solved as
+      So by using <a
+        href="http://en.wikipedia.org/wiki/Linear_least_squares_%28mathematics%29">linear
+        least squares</a> the \(\theta\) vector can be solved as (big jump
+      here)
 
       \[
       \theta = \left(X^T X\right)^{-1} X^T F(\chi) \, \mathrm{,} \label{lls_X}
@@ -969,12 +979,38 @@
   
     Using axiom
   <pre>
-  m := matrix([[1,-2,4,-8,16],[1,-1,1,-1,1],[1,0,0,0,0],[1,1,1,1,1],[1,2,4,8,16]])
+  m := matrix([[1,-2,4,-8,16],[1,-1,1,-1,1],[1,0,0,0,0],_
+       [1,1,1,1,1],[1,2,4,8,16]])
   t := transpose(m)
   inverse(t * m) * t</pre>
 
+  <pre>
+        + 0     0    1    0    0  +
+        |                         |
+        |  1     2        2      1|
+        | --   - -   0    -   - --|
+        | 12     3        3     12|
+        |                         |
+        |   1   2     5   2      1|
+        |- --   -   - -   -   - --|
+   (3)  |  24   3     4   3     24|
+        |                         |
+        |   1   1          1    1 |
+        |- --   -    0   - -   -- |
+        |  12   6          6   12 |
+        |                         |
+        |  1     1   1     1    1 |
+        | --   - -   -   - -   -- |
+        + 24     6   4     6   24 +</pre>
+
     gives a \(\theta_1\) with the same constant coefficients as in
     [\(\ref{dc5_result}\)], oh boy what fun.
+    We use the third row in the above matrix can be used to get the
+    2nd derivative.
+    Note the first row is simple because it corresponds to the
+    0-th derivative which is just the original data.  Had we used
+    more than 5 points in the fitting the first row gets more
+    interesting.
     </p>
 
     <p>
@@ -989,7 +1025,8 @@
      <p>
     
   <pre>
-  m := matrix([[1,0,0,0,0],[1,1,1,1,1],[1,2,4,8,16],[1,3,9,27,3*27],[1,4,16,4*16,16*16]])
+  m := matrix([[1,0,0,0,0],[1,1,1,1,1],[1,2,4,8,16],_
+       [1,3,9,27,3*27],[1,4,16,4*16,16*16]])
   t := transpose(m)
   inverse(t * m) * t</pre>
 
@@ -1014,8 +1051,6 @@
         |  1     1    1     1   1 |
         | --   - -    -   - -  -- |
         + 24     6    4     6  24 +</pre>
-
-
 
      </p>
 
@@ -1055,7 +1090,9 @@
     |  --    - --    --     --    - --    --  |
     |  48      16    24     24      16    48  |</pre>
 
-     we note that the \(\theta_1\), 2nd, row looks reasonable.
+     we note that the \(\theta_1\), 2nd, row looks reasonable,
+     and it looks a little more complex because we are now
+     not doing an exact polynomial fitting.
      </p>
 
 
@@ -1079,8 +1116,41 @@
      </p>
 
 
+  <h2>Application</h2>
+
+  <p>
+    We wrote the libst library C function
+
+    <pre>
+  void stSequence_deriv(struct StSequence *s, int fromArray, int toArray, int derivNum, int n, int m)</pre>
+
+    It generates an array of floating point values that represent
+    the <em>derivNum</em> derivative (0,1,2,3 ...) of an array using
+    a polynomial fitting with highest order \(x^n\) using \(m\) points
+    around each data point.  \(m\) must be at least \(n+1\).  If \(m\)
+    is less than \(n+1\) there will be smoothing.  For noisy data this
+    we can use \(m \lt p+1\) to make the resulting data smoother, i.e.
+    look less noisy.  Getting smooth derivatives is the whole point
+    of this process.  Some of the C code in <em>stSequence_deriv</em>
+    is generated with open-axiom.  axiom works too, but not
+    non-interactively.
+  </p>
+
 
   <h3>References</h3>
-  http://www2.math.umd.edu/~dlevy/classes/amsc466/lecture-notes/differentiation-chap.pdf
+
+  <ul>
+    <li>
+    Introduction to this topic:
+    http://www2.math.umd.edu/~dlevy/classes/amsc466/lecture-notes/differentiation-chap.pdf
+    </li>
+  </ul>
+
+
+  <div>
+    St index
+    <a href="integrating.html">Numerically integrating</a>
+  </div>
+
   </body>
 </html>

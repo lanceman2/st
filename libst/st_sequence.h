@@ -32,7 +32,5 @@ extern
 void stSequence_setLabel(struct StSequence *v, int dim,
     const char *fmt, ...) ST__printf(3,4);
 extern
-void stSequence_appendDeriv(struct StSequence *s, int *dims);
-extern
 void stSequence_deriv(struct StSequence *s, int from, int to,
     int deriv_num, int poly_order, int points);

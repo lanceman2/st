@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang=en>
+  <head>
+    <meta charset="UTF-8"> 
+    <link rel="stylesheet" href="st.css">
+    <title>Numerical Integrating</title>
+    <!-- EDIT this MathJax file path -->
+    <script id=localjaxscript
+       src="../../../public_html/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script>
+      if('undefined' === typeof MathJax)
+      {
+        /* If we do not have
+           ../../../public_html/MathJax/MathJax.js
+           we get it from the following URL.
+         */
+         mathJaxSrc =
+           "https://cdn.mathjax.org/mathjax/latest/MathJax.js" +
+           "?config=TeX-AMS-MML_HTMLorMML"
+         document.write(
+            "<script src=\"" + mathJaxSrc +
+            "\"> <" + "/" + "script" + ">"
+         );
+       }
+       else
+         mathJaxSrc = document.getElementById('localjaxscript').src
+    </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
+    </script>
+  </head>
+  <body>
+
+    <script>
+      document.write(
+          "<h5>Using MathJax from " +
+          mathJaxSrc +
+          "<\h5>");
+    </script>
+ 
+    <h1>Notes on Numerical Integrating</h1>
+
+    <p>
+    We found a method of <a href="differentiation.html">numerical
+      differentiation</a>, differentiating noisy fixed sample rate data.
+    We wish to do something similar when integrating this data.  We know
+    the task of integrating data with naturally smooth the data, there as
+    differentiating it naturally makes the data noisier.  Another
+    consideration is that we would like to mirror the ability to integrate
+    the data and then reverse the effect of integration by differentiating
+    it back to what we started with, as it would had we done this to data
+    from a "clean" analytic function.  If we could integrate and
+    differentiate in a reversible fashion, then we can think of this as
+    real physics modeling with for example ordinary differential equations
+    from Newtons 2nd Law.  In bench marking this reversible
+    we must remember smooth the data before attempting to compare.
+
+    </p>
+
+
+    <p>
+    Using "The Method of Undetermined Coefficients" we find the forms we
+    need to calculate integrals of functions that are represented as
+    a sequence of variable values at fixed intervals.  We don't have more
+    information about the "functions" than that. 
+    </p>
+
+    <p>
+    As in before in <a href="differentiation.html">Numerically
+      differentiation</a>,
+    define the polynomial fit function
+
+    \begin{align}
+    
+    \Psi_\theta(\chi) = & \theta_0 + \theta_1 \chi + \theta_2 \chi^2 +
+    \dots  + \theta_n \chi^n \nonumber \\
+    = & \sum_{j=0}^n \theta_j \chi^j \mathrm{,} \label{Psi_def}
+
+    \end{align}
+
+    and as before, \(\chi\) has just integer values near \(0\),
+    and \(n\) we can choose what ever we like.
+    For \(n=2\) will be a little like Simpson's Law, but not
+    quite since we will be sliding through the fitting
+    function a little differently.
+
+    \(\chi\) is a position in the data with \(\chi = 0\) being
+    at a special position in the data.  We choose values of
+    \(\theta_j\) such that \(\Psi_\theta(\chi)\) is as close
+    as possible to the value of the data at the corresponding
+    \(\chi\) value.
+    </p>
+
+    <p>
+    We carry over the results from  our <a
+      href="differentiation.html">Numerically differentiation</a>,
+    and use the same notation.  We "turn a crank" and we get
+    the \(\theta\) vector and we pick it up there.
+    </p>
+
+    <p>
+    Now we have a fitting function \(\Psi_\theta(\chi)\) that we will 
+    integrate analytically (exactly).  We define
+
+    \[
+        I_{0,1} \equiv \int^1_{\chi=0}
+        \Psi_\theta(\chi) \, \mathrm{d}x \label{I_def}
+    \]
+
+    as the addition to the value of the integrated data in going
+    from \(\chi = 0\) to \(\chi = 1\), or put another way, in going
+    from the current data point to the next, with a given
+    polynomial fit function, \(\Psi_\theta(\chi)\).
+    As before
+
+    \[
+    \chi \equiv \frac{x - \delta}{h} \label{chi_def}
+    \]
+    where \(x\) is a position in the dependent variable of the
+    real data, \(\delta\) is a value in this space that
+    corresponds a point of interest in the data, and \(h\)
+    is the constant distance between data values.
+
+    From [\(\ref{chi_def}\)]
+
+    \[
+      h \, \mathrm{d}\chi = \mathrm{d}x \, \mathrm{.}
+      \label{dchi}
+    \]
+
+    From [\(\ref{Psi_def}\)], [\(\ref{I_def}\)] and [\(\ref{dchi}\)]
+
+    \begin{align}
+      I_{0,1} = & h \, \left. \sum_{j=0}^n
+       \frac{\theta_j \,\chi^{j+1}}{j+1} \right|_{\chi=0}^1 =
+       h \, \left[
+       \sum_{j=0}^n \frac{\theta_j \,(1)^{j+1}}{j+1} -
+       \sum_{j=0}^n \frac{\theta_j \,(0)^{j+1}}{j+1}
+       \right] \nonumber \\
+       = & h \, \sum_{j=0}^n \frac{\theta_j}{j+1} = h \left[ \theta_0 +
+       \frac{1}{2} \theta_1 + \frac{1}{3} \theta_2 \dots + \frac{1}{n+1}
+       \theta_n \right]
+    \end{align}
+    </p>
+
+    <p>
+    Can we make this reversible?  If we use the same parameters
+    for integration and differentiation?
+    </p>
+
+    <p>
+    I think it will be pretty close to reversible, but since
+    we are not using a one polynomial fit for all the data,
+    but a different polynomial fit as we move through
+    the data, there should be some lose of data; and not
+    just due to addition and multiplication round off errors.
+    </p>
+
+  <div>
+    St index
+    <a href="differentiation.html">Numerically differentiation</a>
+  </div>
+
+
+  </body>
+</html>
