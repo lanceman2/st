@@ -42,6 +42,22 @@
     <h1>Notes on Numerical Differentiation</h1>
 
     <p>
+    We can differentiate analytic functions, but to say that we
+    differentiate numerical data is not the same.  It's just an analogy.
+    Most measured data is noisy and, in our case, may be of unknown
+    origin, and so can't correspond with an analytic function.  We keep
+    the idea of differentiating analytic functions as an unattainable
+    ideal, sort of.  Numerical Differentiation is what ever you define it
+    to be.  We don't know what the continuum of values are between the
+    data points that we are given, so we imagine, guess.  We don't even
+    know the nature of the noise; is it random or biased some way.  The
+    bias can be from numerical conversion, like when converting binary
+    float data to a ASCII decimal data in like in <a
+    href="https://www.kaggle.com/c/axa-driver-telematics-analysis/">the
+      axa-driver-telematics-analysis kaggle contest</a>.
+    </p>
+
+    <p>
     Using "The Method of Undetermined Coefficients" we find the forms we
     need to calculate derivatives of functions that are represented as
     a sequence of variable values at fixed intervals.  We don't have more
@@ -1099,14 +1115,14 @@
      <h3>Better Notation</h3>
 
      <p>
-       There are three integer parameters of interest.  They are
-       the \(n\) the largest polynomial power as in \(x^n\),
-       \(m\) the number of \(f()\) function values used, and
-       by convention we order the component values of \(\chi\)
-       making \(\chi_1\) the lowest and \(\chi_m\) the highest.
-       So the integer triplet \(n, m, \chi_1\) are enough to
-       define a method to approximate a derivative (so far).
-       We may use this in the code.
+       There are three integer parameters of interest.  They are the \(n\)
+       the largest polynomial power as in \(x^n\), \(m\) the number of
+       data values used which are \(F(\chi)\) function values, and by convention
+       we order the component values of \(\chi\) making \(\chi_1\) the
+       lowest and \(\chi_m\) the highest.  So the integer triplet \(n, m,
+       \chi_1\) are enough to define a method to approximate a derivative
+       (so far).  We may use this \(n\), \(m\) convention  in the C and
+       axiom code.
      </p>
 
      <p>
@@ -1134,6 +1150,25 @@
     of this process.  Some of the C code in <em>stSequence_deriv</em>
     is generated with open-axiom.  axiom works too, but not
     non-interactively.
+  </p>
+
+  <p>
+  We must keep in mind that the 0th derivative is a very important
+  data smoothing function and that the level of smoothing using
+  in these operations in combination can have beneficial and
+  advance effects.
+  </p>
+  
+  <p>
+  It may be that we are seeking the most
+  reversible numerical operations.  For example we want to preserve
+  the following that applies to analytic functions so that we
+  have an analogous numerical concept 
+
+  \[
+    
+
+
   </p>
 
 

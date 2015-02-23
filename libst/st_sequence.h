@@ -34,3 +34,6 @@ void stSequence_setLabel(struct StSequence *v, int dim,
 extern
 void stSequence_deriv(struct StSequence *s, int from, int to,
     int deriv_num, int poly_order, int points);
+extern
+void stSequence_int(struct StSequence *s, int from, int to,
+    int poly_order, int points, StReal_t startValue);

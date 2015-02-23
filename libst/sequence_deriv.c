@@ -52,9 +52,14 @@ void stSequence_deriv(struct StSequence *s, int from, int to,
   ASSERT(s->dof > 0);
   ASSERT(s->len);
   ASSERT(from != to);
+  ASSERT(poly_order >= 1);
   ST_ASSERT(from < s->dof);
-  ST_ASSERT(s->len >= points);
-  ST_ASSERT(points > poly_order);
+  ST_VASSERT(points > poly_order,
+      "You cannot fit a polynomial of order x^%d with "
+      "just %d points.\n", poly_order, points);
+  ST_VASSERT(s->len >= points,
+      "You cannot differentiate just %zu data points, "
+      "at least %d points are needed.\n", s->len, points);
 
   const StReal_t *coef = 0;
   coef = _get_coef(deriv_num, poly_order, points);

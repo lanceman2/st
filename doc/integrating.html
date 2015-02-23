@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8"> 
     <link rel="stylesheet" href="st.css">
-    <title>Numerical Integrating</title>
+    <title>Numerically Integrating</title>
     <!-- EDIT this MathJax file path -->
     <script id=localjaxscript
        src="../../../public_html/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -39,25 +39,34 @@
           "<\h5>");
     </script>
  
-    <h1>Notes on Numerical Integrating</h1>
+    <h1>Notes on Numerically Integrating</h1>
+
+   <p>
+    We are talking about the integral of the data that is the reverse
+    of the derivative of the data or antiderivative, and not definite
+    integrals which are just one (real or complex) number.
+    </p>
+
+    <h3>Fundamental Theorems of Calculus</h3>
 
     <p>
     We found a method of <a href="differentiation.html">numerical
       differentiation</a>, differentiating noisy fixed sample rate data.
     We wish to do something similar when integrating this data.  We know
-    the task of integrating data with naturally smooth the data, there as
-    differentiating it naturally makes the data noisier.  Another
+    the task of integrating data will tend to smooth the data, where as
+    differentiating it tends to make the data noisier.  Another
     consideration is that we would like to mirror the ability to integrate
-    the data and then reverse the effect of integration by differentiating
-    it back to what we started with, as it would had we done this to data
-    from a "clean" analytic function.  If we could integrate and
-    differentiate in a reversible fashion, then we can think of this as
-    real physics modeling with for example ordinary differential equations
-    from Newtons 2nd Law.  In bench marking this reversible
-    we must remember smooth the data before attempting to compare.
-
+    the data and then reverse the effect of integration by
+    differentiating it back to what we started with, as it would had we
+    done this to data from a "clean" analytic function.  If we could
+    integrate (antidifferentiate) and differentiate in a reversible
+    fashion like that then we can think of this as real physics modeling
+    with for example ordinary differential equations from Newtons 2nd Law.
+    In bench marking this reversibility idea we must remember that
+    smoothing the data before attempting to compare original data to data
+    that has been differentiated and than integrated
+    (antidifferentiated).
     </p>
-
 
     <p>
     Using "The Method of Undetermined Coefficients" we find the forms we
@@ -112,7 +121,8 @@
     from \(\chi = 0\) to \(\chi = 1\), or put another way, in going
     from the current data point to the next, with a given
     polynomial fit function, \(\Psi_\theta(\chi)\).
-    As before
+
+    As before we use the following change of variables
 
     \[
     \chi \equiv \frac{x - \delta}{h} \label{chi_def}
@@ -132,7 +142,7 @@
     From [\(\ref{Psi_def}\)], [\(\ref{I_def}\)] and [\(\ref{dchi}\)]
 
     \begin{align}
-      I_{0,1} = & h \, \left. \sum_{j=0}^n
+      I_{0,1}(\delta) = & h \, \left. \sum_{j=0}^n
        \frac{\theta_j \,\chi^{j+1}}{j+1} \right|_{\chi=0}^1 =
        h \, \left[
        \sum_{j=0}^n \frac{\theta_j \,(1)^{j+1}}{j+1} -
@@ -142,24 +152,58 @@
        \frac{1}{2} \theta_1 + \frac{1}{3} \theta_2 \dots + \frac{1}{n+1}
        \theta_n \right]
     \end{align}
+
+    So to get the value of the integral at a generic point in the
+    data we have a keep adding to the previous integral at a
+    previous point like so
+
+    \[
+        G(\delta + h) = G(\delta) + I_{0,1}(\delta)
+    \]
+
+    where \(G(\delta)\) is the integral at a generic point,
+    and \(G(\delta + h)\) is the integral at the next point.
+    
+    Remember we really have no integral in the analytic sense,
+    we are pretending that the polynomial fit function is filling in the
+    continuum values that are between the points in this "real world"
+    data.
+
+    Also remember \(\frac{\delta}{h}\) is incremented by one then going
+    to the next data value.
     </p>
 
     <p>
-    Can we make this reversible?  If we use the same parameters
-    for integration and differentiation?
+    To say there is an error in the calculation by using comparison 
+    with an analytical function (that is the data) is not possible, given that we
+    do not have an  analytical function to start with.
+    The same can be said for the <a
+      href="differentiation.html">numerically differentiation</a>,
+    and more so given that we need smoothing in order to
+    differentiate this noisy data.
+    We need a different concept of error then comparing
+    to an analytical function.  More study is needed.
+    </p>
+
+    <p>
+    Can we make this reversible, if we use compatible parameters
+    for integration and differentiation?  Making it so that
+    we appear to have a fundamental theorem of calculus for
+    "numerical calculus".
     </p>
 
     <p>
     I think it will be pretty close to reversible, but since
     we are not using a one polynomial fit for all the data,
     but a different polynomial fit as we move through
-    the data, there should be some lose of data; and not
-    just due to addition and multiplication round off errors.
+    the data, there should be some lose of data.  There will be
+    additional lose of data from multiplication round off errors,
+    which I expect to be smaller.
     </p>
 
   <div>
     St index
-    <a href="differentiation.html">Numerically differentiation</a>
+    <a href="differentiation.html">numerically differentiation</a>
   </div>
 
 

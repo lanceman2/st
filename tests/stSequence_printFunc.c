@@ -1,10 +1,10 @@
 #include "../libst/st.h"
 
-#define NPOINTS 7
+#define NPOINTS 20
 static
 StReal_t n;
 
-#define POW  (4) // x^POW
+#define POW  (1) // x^POW
 
 #if 1 // 0 for sin and cos
 
@@ -109,9 +109,9 @@ int main(int argc, char **argv)
     deriv2[i] = deriv2F(i);
   }
 
-  stSequence_deriv(s, 1, 4, 2, 3/*x^n*/, 5/*points*/);
-  stSequence_deriv(s, 1, 5, 2, 4/*x^n*/, 5/*points*/);
-
+  stSequence_int(s, 1, 4, 1/*x^n*/, 2/*points*/, 0/*start*/);
+  //stSequence_deriv(s, 1/*from*/, 5/*to*/, 2/*deriv*/, 3/*x^n*/, 5/*points*/);
+  //stSequence_deriv(s, 1, 6, 2/*deriv*/, 4/*x^n*/, 5/*points*/);
 
   //stSequence_deriv(s, 1, 5, 1, 4/*x^n*/, 4/*points*/);
   //stSequence_deriv(s, 1, 6, 1, 3/*x^n*/, 9/*points*/);
