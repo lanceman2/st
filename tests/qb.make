@@ -5,7 +5,9 @@ NO_INSTALL := .
 debug_LIBADD := ../libst/libst.so ../libstg/libstg.so
 debug_ADD_PKG := glib-2.0
 
-stSequence_readStdin_LIBADD := ../libst/libst.so
+stSequence_createASCIIFile_LIBADD := ../libst/libst.so
+stSequence_binary_LIBADD := ../libst/libst.so
+stSequence_binary_LDFLAGS := -lm
 stSequence_printFunc_LIBADD := ../libst/libst.so
 stSequence_printFunc_LDFLAGS := -lm
 

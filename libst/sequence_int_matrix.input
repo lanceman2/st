@@ -23,11 +23,11 @@
 
 -- n
 powerMin := 1 -- x^Min fit
-powerMax := 3 -- x^Max fit
+powerMax := 5 -- x^Max fit
 
 -- m
 pointsMin := 2 -- min number of points to fit
-pointsMax := 5 -- max number of points to fit
+pointsMax := 6 -- max number of points to fit
 
 outPath := "sequence__int__matrix.h"
 

@@ -9,3 +9,13 @@
 #  define FMT       "%.16g"
 #endif
 
+#if 0
+static inline
+int _stUtil_isLittleEndian(void)
+{
+  const int i = 1;
+  // there is one in the first byte if is Little Endian
+  // there is one in the last int byte if is Big Endian
+  return (*(char *) &i) == 1;
+}
+#endif

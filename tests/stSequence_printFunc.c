@@ -1,12 +1,12 @@
 #include "../libst/st.h"
 
-#define NPOINTS 20
+#define NPOINTS 33
 static
 StReal_t n;
 
-#define POW  (1) // x^POW
+#define POW  (3) // x^POW
 
-#if 1 // 0 for sin and cos
+#if 0 // 0 for sin and cos functions
 
 // testing 4 point fit.
 static inline
@@ -33,6 +33,18 @@ StReal_t deriv2F(size_t i)
   return x;
 }
 
+static inline
+StReal_t intFunc(size_t i)
+{
+  StReal_t d, x;
+  d = i/n - 1;
+  x = 1;
+  int j;
+  for(j=0;j<=POW;++j)
+    x *= d;
+  return n*x/(POW+1);
+}
+
 
 static inline
 StReal_t func(size_t i)
@@ -46,6 +58,7 @@ StReal_t func(size_t i)
   return x;  
 }
 #else
+
 #include <math.h>
 
 #define IFREQ 5
@@ -68,6 +81,11 @@ StReal_t deriv2F(size_t i)
   return -IFREQ*IFREQ*sinf(phase(i))/(n*n);
 }
 
+static inline
+StReal_t intFunc(size_t i)
+{
+  return -n*cosf(phase(i))/IFREQ;
+}
 
 static inline
 StReal_t func(size_t i)
@@ -94,12 +112,13 @@ int main(int argc, char **argv)
 
   struct StSequence *s;
 
-  s = stSequence_create(NPOINTS, 4, "X F F' F''");
-  StReal_t *x, *y, *deriv, *deriv2;
+  s = stSequence_create(NPOINTS, 5, "X F F' F'' F^(-1)");
+  StReal_t *x, *y, *deriv, *deriv2, *intF;
   x = stSequence_x(s)[0];
   y = stSequence_x(s)[1];
   deriv = stSequence_x(s)[2];
   deriv2 = stSequence_x(s)[3];
+  intF = stSequence_x(s)[4];
   size_t i;
   for(i=0;i<NPOINTS;++i)
   {
@@ -107,14 +126,18 @@ int main(int argc, char **argv)
     y[i] = func(i);
     deriv[i] = derivF(i);
     deriv2[i] = deriv2F(i);
+    intF[i] = intFunc(i);
   }
 
-  stSequence_int(s, 1, 4, 1/*x^n*/, 2/*points*/, 0/*start*/);
-  //stSequence_deriv(s, 1/*from*/, 5/*to*/, 2/*deriv*/, 3/*x^n*/, 5/*points*/);
-  //stSequence_deriv(s, 1, 6, 2/*deriv*/, 4/*x^n*/, 5/*points*/);
+  stSequence_int(s, 1, 5, 1/*x^n*/, 2/*points*/, intFunc(0)/*start*/);
+  stSequence_int(s, 1, 6, 3/*x^n*/, 4/*points*/, intFunc(0)/*start*/);
+  stSequence_int(s, 1, 7, 4/*x^n*/, 5/*points*/, intFunc(0)/*start*/);
+  stSequence_int(s, 1, 8, 5/*x^n*/, 6/*points*/, intFunc(0)/*start*/);
+     //stSequence_deriv(s, 1/*from*/, 6/*to*/, 2/*deriv*/, 3/*x^n*/, 5/*points*/);
+  //stSequence_deriv(s, 1, 7, 2/*deriv*/, 4/*x^n*/, 5/*points*/);
 
-  //stSequence_deriv(s, 1, 5, 1, 4/*x^n*/, 4/*points*/);
-  //stSequence_deriv(s, 1, 6, 1, 3/*x^n*/, 9/*points*/);
+  //stSequence_deriv(s, 1, 8, 1, 4/*x^n*/, 4/*points*/);
+  //stSequence_deriv(s, 1, 9, 1, 3/*x^n*/, 9/*points*/);
 
 
 

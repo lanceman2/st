@@ -1,5 +1,6 @@
 hello
 debug
-stSequence_readStdin ${HOME}/projects/kaggle/axa-driver-telematics-analysis/rawData/drivers/22/100.csv | quickplot -l -Ld -
+stSequence_createASCIIFile ${HOME}/projects/kaggle/axa-driver-telematics-analysis/rawData/drivers/22/100.csv | quickplot -l -Ld -
 stSequence_printFunc | quickplot -L -
+stSequence_binary
 

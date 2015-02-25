@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 
   struct StSequence *s;
 
-  s = stSequence_createFile(argv[1], 0);
+  s = stSequence_createASCIIFile(argv[1], 0);
 
   if(stSequence_getDof(s) == 2)
   {
@@ -26,6 +26,8 @@ int main(int argc, char **argv)
     stSequence_setLabel(s, 1, "Y");
   }
 
+
+#if 0
   stSequence_deriv(s, 0, 1, 1, 4/*poly_order*/, 5/*points*/);
   stSequence_deriv(s, 0, 2, 1, 3/*poly_order*/, 5/*points*/);
   stSequence_deriv(s, 0, 3, 1, 2/*poly_order*/, 5/*points*/);
@@ -36,6 +38,10 @@ int main(int argc, char **argv)
   stSequence_deriv(s, 0, 5, 1, 4/*poly_order*/, 9/*points*/);
   stSequence_deriv(s, 0, 6, 1, 3/*poly_order*/, 9/*points*/);
   stSequence_deriv(s, 0, 7, 1, 2/*poly_order*/, 9/*points*/);
+#endif
+
+  stSequence_deriv(s, 0/*from*/, 2/*to*/, 1/*deriv*/, 1/*poly_order*/, 2/*points*/);
+  stSequence_deriv(s, 0, 3, 1, 3/*poly_order*/, 7/*points*/);
 
 
 

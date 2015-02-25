@@ -70,9 +70,6 @@ numerically and other C code.
   >```sudo apt-get install open-axiom```
 
 
-# Development Notes
-
-- <a href="doc/differentiation.html">differentiation</a>
 
 # st Homepage
 

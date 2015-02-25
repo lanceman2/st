@@ -1,43 +1,7 @@
-<!DOCTYPE html>
-<html lang=en>
-  <head>
-    <meta charset="UTF-8"> 
-    <link rel="stylesheet" href="st.css">
-    <title>Numerical Differentiation</title>
-    <!-- EDIT this MathJax file path -->
-    <script id=localjaxscript
-       src="../../../public_html/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-    </script>
-    <script>
-      if('undefined' === typeof MathJax)
-      {
-        /* If we do not have
-           ../../../public_html/MathJax/MathJax.js
-           we get it from the following URL.
-         */
-         mathJaxSrc =
-           "https://cdn.mathjax.org/mathjax/latest/MathJax.js" +
-           "?config=TeX-AMS-MML_HTMLorMML"
-         document.write(
-            "<script src=\"" + mathJaxSrc +
-            "\"> <" + "/" + "script" + ">"
-         );
-       }
-       else
-         mathJaxSrc = document.getElementById('localjaxscript').src
-    </script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
-    </script>
-  </head>
-  <body>
-
-    <script>
-      document.write(
-          "<h5>Using MathJax from " +
-          mathJaxSrc +
-          "<\h5>");
-    </script>
+<?php
+  require 'common.ph';
+  stHeader('Numerical Differentiation');
+?>
  
     <h1>Notes on Numerical Differentiation</h1>
 
@@ -1182,10 +1146,6 @@
   </ul>
 
 
-  <div>
-    St index
-    <a href="integrating.html">Numerically integrating</a>
-  </div>
-
-  </body>
-</html>
+<?php
+  stFooter()
+?>

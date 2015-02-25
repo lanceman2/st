@@ -70,7 +70,7 @@ set -x
 ###########################################################
 # top source directory files
 ###########################################################
-rm -f README.html qb_config config.h
+rm -f README.html qb_config config.h qb_php_compile
 rm_common
 
 ###########################################################
@@ -79,7 +79,8 @@ rm_common
 cd libst/ || FAIL
 
 rm_common
-rm -f debug.h lib_main.c st.pc st.h
+rm -f debug.h lib_main.c st.pc st.h\
+ sequence_deriv_coef.h sequence_int_matrix.h
 
 cd .. || FAIL
 
@@ -110,9 +111,25 @@ cd .. || FAIL
 ###########################################################
 cd tests/ || FAIL
 rm_common
-rm -f hello debug stSequence_readStdin\
+rm -f hello debug\
+ stSequence_binary\
+ stSequence_createASCIIFile\
  stSequence_printFunc
 cd .. || FAIL
+
+###########################################################
+# subdirectory doc/
+###########################################################
+
+cd doc/ || FAIL
+  
+rm -f GNUmakefile\
+ arcLength.html\
+ differentiation.html\
+ integrating.html
+
+cd .. || FAIL
+
 
 ###########################################################
 # subdirectory examples/
