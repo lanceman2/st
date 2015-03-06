@@ -129,11 +129,13 @@ int main(int argc, char **argv)
     intF[i] = intFunc(i);
   }
 
-  stSequence_int(s, 1, 5, 1/*x^n*/, 2/*points*/, intFunc(0)/*start*/);
-  stSequence_int(s, 1, 6, 3/*x^n*/, 4/*points*/, intFunc(0)/*start*/);
-  stSequence_int(s, 1, 7, 4/*x^n*/, 5/*points*/, intFunc(0)/*start*/);
-  stSequence_int(s, 1, 8, 5/*x^n*/, 6/*points*/, intFunc(0)/*start*/);
-     //stSequence_deriv(s, 1/*from*/, 6/*to*/, 2/*deriv*/, 3/*x^n*/, 5/*points*/);
+  stSequence_deriv(s, 1, 5, 1, 1/*x^n*/, 2/*points*/);
+  stSequence_deriv(s, 1, 6, 1, 2/*x^n*/, 3/*points*/);
+  //stSequence_integrate(s, 1, 5, 1/*x^n*/, 2/*points*/, intFunc(0)/*start*/);
+  //stSequence_integrate(s, 1, 6, 3/*x^n*/, 4/*points*/, intFunc(0)/*start*/);
+  //stSequence_integrate(s, 1, 7, 4/*x^n*/, 5/*points*/, intFunc(0)/*start*/);
+  //stSequence_integrate(s, 1, 8, 5/*x^n*/, 6/*points*/, intFunc(0)/*start*/);
+  //stSequence_deriv(s, 1/*from*/, 6/*to*/, 2/*deriv*/, 3/*x^n*/, 5/*points*/);
   //stSequence_deriv(s, 1, 7, 2/*deriv*/, 4/*x^n*/, 5/*points*/);
 
   //stSequence_deriv(s, 1, 8, 1, 4/*x^n*/, 4/*points*/);

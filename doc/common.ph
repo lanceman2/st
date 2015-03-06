@@ -3,8 +3,7 @@
 function stFileIndex()
 {
   $script = basename($_SERVER["SCRIPT_FILENAME"]);
-  echo "<div style=\"background-color: #8EBBDE;".
-    "padding: 5px;\">\n";
+  echo "<div class=nav>\n";
   foreach(glob("*.phtml") as $gf)
   {
     $f = str_replace('.phtml','', $gf);

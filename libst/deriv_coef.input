@@ -36,7 +36,7 @@ powerMax := 7 -- x^7 fit
 pointsMin := 2 -- number of points to fit
 pointsMax := 11 -- number of points to fit
 
-outPath := "sequence__deriv__coef.h"
+outPath := "deriv__coef.h"
 
 --
 ---------------------------------------------------------------------

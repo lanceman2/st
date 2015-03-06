@@ -5,18 +5,14 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <stdbool.h>
-#include "st_debug.h"
-#include "st_type.h"
-#include "type.h"
-#include "st_sequence.h"
+#include "st.h"
 #include "debug.h"
-#include "sequence.h"
 
 
 /* See file ../doc/integrating.html for details:
  *
  * "Notes on Numerically Integrating" for calculations of the constants
- * in the expressions below in the generated file sequence_int_coef.h
+ * in the expressions below in the generated file int_coef.h
  *
  * We used axiom (open-axiom) to calculate them.
  *
@@ -25,7 +21,7 @@
 // If h is not 1 than do a change of variables, a scaling.
 
 
-#include "sequence_int_matrix.h"
+#include "int_matrix.h"
 
 // Multiply a vector by a matrix   theta = matrix * vec
 static inline
@@ -42,23 +38,18 @@ void _multiply_MxV(StReal_t *theta, const StReal_t *matrix,
   }
 }
 
-void stSequence_int(struct StSequence *s, int from, int to,
-    int poly_order, int points, StReal_t start)
+void stIntegrate(const StReal_t *in, StReal_t *out,
+    size_t len, int poly_order, int points, StReal_t start)
 {
-  ASSERT(s);
-  ASSERT(s->x);
-  ASSERT(s->x[0]);
-  ASSERT(s->dof > 0);
-  ASSERT(s->len);
-  ASSERT(from != to);
+  ASSERT(points >= 0);
+  ASSERT(in != out);
   ASSERT(poly_order >= 1);
-  ST_ASSERT(from < s->dof);
   ST_VASSERT(points > poly_order,
       "You cannot fit a polynomial of order x^%d with "
       "just %d points.\n", poly_order, points);
-  ST_VASSERT(s->len >= points,
+  ST_VASSERT(len >= points,
       "You cannot integrate just %zu data points, "
-      "at least %d points are needed.\n", s->len, points);
+      "at least %d points are needed.\n", len, points);
 
   const StReal_t *matrix;
   matrix = _get_matrix(poly_order, points);
@@ -70,7 +61,7 @@ void stSequence_int(struct StSequence *s, int from, int to,
   int rows;
   rows = poly_order + 1; // number rows in all matrices
 
-#if 1
+#if 0
 #ifdef DEBUG
   {
     int r,c,m; // row, column, matrix_index
@@ -97,22 +88,6 @@ void stSequence_int(struct StSequence *s, int from, int to,
 #endif
 
 
-  if(to >= s->dof)
-  {
-    ST_ASSERT(to == s->dof);
-    _stSequence_appendDof(s, "%s^d-1(%dpt,x^%d)",
-        s->label[from], points, poly_order);
-    ASSERT(s->dof > to);
-  }
-  else
-    // we must be clobbering an array
-    stSequence_setLabel(s, to, "%s^d-1(%dpt,x^%d)",
-        s->label[from], points, poly_order);
-
-  StReal_t *in, *out;
-  in = s->x[from]; // values to integrate
-  out = s->x[to];  // values out are the integral
-
   // There are 
   // The matrix is size: (points) columns by (poly_order+1) rows.
   // There are (poly_order+1) \theta component values in the \theta
@@ -135,7 +110,7 @@ void stSequence_int(struct StSequence *s, int from, int to,
   // of points is odd, and symmetry in differentiation may trump symmetry
   // in integration.
   size_t i = 0, iMax;
-  iMax = s->len - 1; // so we only have len-1 values to do.
+  iMax = len - 1; // so we only have len-1 values to do.
   int rc, i1, i2;
   i1 = points/2;
   i2 = iMax - (points-1)/2;

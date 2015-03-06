@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "../libst/st_debug.h"
-#include "stg_debug.h"
+#include "../libst/st.h"
+#include "stg.h"
 #include <glib.h>
 
 

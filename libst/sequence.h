@@ -15,7 +15,3 @@ struct StSequence
   size_t len; // number of points like 10,003
 };
 
-
-extern
-void _stSequence_appendDof(struct StSequence *s,
-    const char *labelFmt, ...) ST__printf(2,3);

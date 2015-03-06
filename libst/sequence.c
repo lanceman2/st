@@ -6,14 +6,13 @@
 #include <sys/types.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "st_debug.h"
-#include "st_type.h"
+#include "st.h"
 #include "type.h"
-#include "st_sequence.h"
 #include "debug.h"
 #include "sequence.h"
 
-// Use to enforce file compatibility.
+
+// Use to enforce binary sequence file compatibility.
 #define FILE_HEADER "This is a stSequence file version 0.1\n"
 #define LABEL_LEN (86) // max length of label string including '\0'
 
@@ -22,6 +21,18 @@ int _isNotStd(const char *path)
 {
   return (path && !(path[0] == '-' && path[1] == '\0'));
 }
+
+#ifdef DEBUG
+  #define ASSERT_SEQUENCE(s) \
+    ASSERT(s); \
+    ASSERT(s->x); \
+    ASSERT(s->dof >= 0); \
+    ASSERT(s->len); \
+    ASSERT(s->label)
+#else
+  #define ASSERT_SEQUENCE(s) /* empty macro */
+#endif
+
 
 extern // Crate a sequence from a binary file.
 struct StSequence *stSequence_createBinFile(const char *path)
@@ -103,13 +114,64 @@ struct StSequence *stSequence_createBinFile(const char *path)
 }
 
 // binary write StSequence to a file
-void stSequence_writeBinFile(struct StSequence *s, const char *path)
+// full control of what to write
+void stSequence_writeBinFileFull(const struct StSequence *s,
+    const char *path, const int *dofs, size_t fromI, size_t toI)
 {
-  ASSERT(s);
-  ASSERT(s->x);
-  ASSERT(s->x[0]);
-  ASSERT(s->dof > 0);
-  ASSERT(s->len);
+  ASSERT_SEQUENCE(s);
+  ASSERT(fromI < s->len);
+  ASSERT(toI < s->len);
+  ASSERT(toI >= fromI);
+  ASSERT(dofs);
+
+  const int *d;
+  int newDof = 0;
+  {
+    for(d=dofs;*d >= 0; ++d)
+    {
+      ASSERT(*d < s->dof);
+      ++newDof;
+    }
+  }
+
+  FILE *file;
+
+  if(_isNotStd(path))
+    ST_VASSERT(file = fopen(path, "w"),
+        "fopen(\"%s\", \"w\") failed\n", path);
+  else // write to stdout
+    ST_ASSERT(file = stdout);
+
+  fprintf(file, FILE_HEADER);
+  int32_t i = 1, dof;
+  // Used to measure (Big or Little) Endian of file by file reader
+  ST_ASSERT(fwrite(&i, sizeof(i), 1, file) == 1);
+  i = sizeof(StReal_t);
+  // Used to check sizeof StReal_t by file reader
+  ST_ASSERT(fwrite(&i, sizeof(i), 1, file) == 1);
+  uint64_t len;
+  len = toI - fromI + 1;
+  ST_ASSERT(fwrite(&len, sizeof(len), 1, file) == 1);
+  dof = newDof;
+  ST_ASSERT(fwrite(&dof, sizeof(dof), 1, file) == 1);
+  for(d=dofs; *d >= 0; ++d)
+  {
+    char *l;
+    l = s->label[*d];
+    ST_ASSERT(fwrite(l, strlen(l), 1, file) == 1);
+    ST_ASSERT(fwrite("\n", sizeof(char), 1, file) == 1);
+  }
+  for(d=dofs; *d >= 0; ++d)
+    ST_ASSERT(fwrite(&(s->x[*d][fromI]), sizeof(StReal_t), len, file) == len);
+
+  if(_isNotStd(path))
+    ST_ASSERT(fclose(file) == 0);
+}
+
+// binary write StSequence to a file
+void stSequence_writeBinFile(const struct StSequence *s, const char *path)
+{
+  ASSERT_SEQUENCE(s);
 
   FILE *file;
 
@@ -145,25 +207,17 @@ void stSequence_writeBinFile(struct StSequence *s, const char *path)
     ST_ASSERT(fclose(file) == 0);
 }
 
-int stSequence_getDof(struct StSequence *v)
+int stSequence_getDof(struct StSequence *s)
 {
-  ASSERT(v);
-  ASSERT(v->x);
-  ASSERT(v->x[0]);
-  ASSERT(v->dof > 0);
-  ASSERT(v->len);
-  return v->dof;
+  ASSERT_SEQUENCE(s);
+  return s->dof;
 }
 
 
-size_t stSequence_getLen(struct StSequence *v)
+size_t stSequence_getLen(struct StSequence *s)
 {
-  ASSERT(v);
-  ASSERT(v->x);
-  ASSERT(v->x[0]);
-  ASSERT(v->dof > 0);
-  ASSERT(v->len);
-  return v->len;
+  ASSERT_SEQUENCE(s);
+  return s->len;
 }
 
 
@@ -185,23 +239,15 @@ int getValueFromStr(char **str, StReal_t *val)
   return 0; // got no value this time
 }
 
-StReal_t **stSequence_x(struct StSequence *v)
+StReal_t **stSequence_x(struct StSequence *s)
 {
-  ASSERT(v);
-  ASSERT(v->x);
-  ASSERT(v->x[0]);
-  ASSERT(v->dof > 0);
-  ASSERT(v->len);
-  return v->x;
+  ASSERT_SEQUENCE(s);
+  return s->x;
 }
 
 const char *stSequence_getLabel(const struct StSequence *s, int dof)
 {
-  ASSERT(s);
-  ASSERT(s->x);
-  ASSERT(s->x[0]);
-  ASSERT(s->dof > 0);
-  ASSERT(s->len);
+  ASSERT_SEQUENCE(s);
   ST_ASSERT(dof < s->dof);
   ASSERT(s->label[dof]);
 
@@ -211,11 +257,7 @@ const char *stSequence_getLabel(const struct StSequence *s, int dof)
 void stSequence_setLabel(struct StSequence *s, int dof,
     const char *fmt, ...)
 {
-  ASSERT(s);
-  ASSERT(s->x);
-  ASSERT(s->x[0]);
-  ASSERT(s->dof > 0);
-  ASSERT(s->len);
+  ASSERT_SEQUENCE(s);
   ST_ASSERT(dof < s->dof);
   ASSERT(s->label[dof]);
 
@@ -238,13 +280,9 @@ void stSequence_setLabel(struct StSequence *s, int dof,
 #endif
 }
 
-void _stSequence_appendDof(struct StSequence *s, const char *labelFmt, ...)
+void stSequence_appendDof(struct StSequence *s, const char *labelFmt, ...)
 {
-  ASSERT(s);
-  ASSERT(s->x);
-  ASSERT(s->x[0]);
-  ASSERT(s->dof > 0);
-  ASSERT(s->len);
+  ASSERT_SEQUENCE(s);
   s->x = realloc(s->x, sizeof(StReal_t *)*(s->dof+1));
   ST_ASSERT(s->x);
   s->x[s->dof] = malloc(sizeof(StReal_t)*s->len);
@@ -358,14 +396,14 @@ struct StSequence *stSequence_create(size_t len, int dof, const char *fmt, ...)
     ST_ASSERT(x[i]);
   }
 
-  struct StSequence *v;
-  v = malloc(sizeof(*v));
+  struct StSequence *s;
+  s = malloc(sizeof(*s));
   ST_ASSERT(x);
-  v->x = x;
-  v->len = len;
-  v->dof = dof;
-  v->label = label;
-  return v;
+  s->x = x;
+  s->len = len;
+  s->dof = dof;
+  s->label = label;
+  return s;
 }
 
 struct StSequence *stSequence_createASCIIFile(const char *path, int dof)
@@ -491,35 +529,31 @@ struct StSequence *stSequence_createASCIIFile(const char *path, int dof)
     ST_ASSERT(label[d]);
   }
 
-  struct StSequence *v;
+  struct StSequence *s;
 
-  ST_ASSERT(v = malloc(sizeof(*v)));
-  v->x = x;
-  v->label = label;
-  v->dof = dof; // dof = 1, 2, 3 as in 1D, 2D ...
-  v->len = len; // number of dofD points
-  return v;
+  ST_ASSERT(s = malloc(sizeof(*s)));
+  s->x = x;
+  s->label = label;
+  s->dof = dof; // dof = 1, 2, 3 as in 1D, 2D ...
+  s->len = len; // number of dofD points
+  return s;
 }
 
-void stSequence_print(struct StSequence *v, FILE *file)
+void stSequence_print(struct StSequence *s, FILE *file)
 {
-  ASSERT(v);
-  ASSERT(v->x);
-  ASSERT(v->dof > 0);
-  ASSERT(v->len);
-  ASSERT(v->label);
-  ASSERT(file);
+  ASSERT_SEQUENCE(s);
+  ST_ASSERT(file);
 
   size_t i, len;
   int dof, j;
   StReal_t **x;
-  len = v->len;
-  dof = v->dof;
-  x = v->x;
+  len = s->len;
+  dof = s->dof;
+  x = s->x;
 
-  fprintf(file, "%s", v->label[0]);
+  fprintf(file, "%s", s->label[0]);
   for(j=1; j<dof; ++j)
-    fprintf(file, " %s", v->label[j]);
+    fprintf(file, " %s", s->label[j]);
   fprintf(file, "\n");
 
   for(i=0; i<len; ++i)
@@ -530,45 +564,68 @@ void stSequence_print(struct StSequence *v, FILE *file)
   }
 }
 
-void stSequence_destroy(struct StSequence *v)
+void stSequence_printFull(struct StSequence *s, FILE *file, const int *dofs)
 {
-  ASSERT(v);
-  ASSERT(v->x);
-  ASSERT(v->dof);
-  ASSERT(v->len);
-  ASSERT(v->label);
+  ASSERT_SEQUENCE(s);
+  ST_ASSERT(file);
+  ST_ASSERT(dofs && *dofs >= 0);
+
+  const int *d;
+  d = dofs;
+  while(*d >= 0)
+    ST_ASSERT(*d++ < s->dof);
+
+  size_t i, len;
+  StReal_t **x;
+  len = s->len;
+  x = s->x;
+
+  d = dofs;
+  fprintf(file, "%s", s->label[*d]);
+  while(*(++d) >= 0)
+    fprintf(file, " %s", s->label[*d]);
+  fprintf(file, "\n");
+
+  for(i=0; i<len; ++i)
+  {
+    d = dofs;
+    while(*d >= 0)
+      fprintf(file, FMT " ", x[*d++][i]);
+    fprintf(file, "\n");
+  }
+}
+
+void stSequence_destroy(struct StSequence *s)
+{
+  ASSERT_SEQUENCE(s);
   int i;
 #ifdef DEBUG
-  for(i=0;i<v->dof;++i)
+  for(i=0;i<s->dof;++i)
   {
-    memset(v->x[i], 0, v->len*sizeof(StReal_t));
-    ASSERT(v->label[i]);
+    memset(s->x[i], 0, s->len*sizeof(StReal_t));
+    ASSERT(s->label[i]);
   }
 #endif
-  for(i=0;i<v->dof;++i)
+  for(i=0;i<s->dof;++i)
   {
-    free(v->x[i]);
-    free(v->label[i]);
+    free(s->x[i]);
+    free(s->label[i]);
   }
 #ifdef DEBUG
-  memset(v->x, 0, sizeof(StReal_t*)*v->dof);
-  memset(v->label, 0, sizeof(char*)*(v->dof+1));
+  memset(s->x, 0, sizeof(StReal_t*)*s->dof);
+  memset(s->label, 0, sizeof(char*)*(s->dof+1));
 #endif
-  free(v->x);
-  free(v->label);
+  free(s->x);
+  free(s->label);
 #ifdef DEBUG
-  memset(v, 0, sizeof(*v));
+  memset(s, 0, sizeof(*s));
 #endif
-  free(v);
+  free(s);
 }
 
 struct StSequence *stSequence_createCopy(const struct StSequence *s)
 {
-  ASSERT(s);
-  ASSERT(s->x);
-  ASSERT(s->dof > 0);
-  ASSERT(s->len);
-  ASSERT(s->label);
+  ASSERT_SEQUENCE(s);
 
   struct StSequence *c;
 
@@ -591,4 +648,92 @@ struct StSequence *stSequence_createCopy(const struct StSequence *s)
   }
 
   return c;
+}
+
+struct StSequence *stSequence_createCopyFull(
+    const struct StSequence *s, const int *dofs,
+    size_t fromI, size_t toI)
+{
+  ASSERT_SEQUENCE(s);
+  ST_ASSERT(fromI < s->len);
+  ASSERT(toI >= fromI);
+
+  const int *d;
+  int newDof = 0;
+  {
+    for(d=dofs;*d >= 0; ++d)
+    {
+      ST_ASSERT(*d < s->dof);
+      ++newDof;
+    }
+  }
+  if(toI >= s->len || toI == 0)
+    toI = s->len - 1;
+
+  struct StSequence *c;
+  c = malloc(sizeof(*c));
+  c->label = malloc(sizeof(char*)*(newDof+1));
+  ST_ASSERT(c->label);
+  c->label[s->dof] = 0;
+  c->x = malloc(sizeof(StReal_t*)*newDof);
+  ST_ASSERT(c->x);
+  c->len = toI - fromI + 1;
+  c->dof = newDof;
+  int i;
+  for(i=0; i<newDof; ++i)
+  {
+    int j;
+    j = dofs[i];
+    c->label[i] = strdup(s->label[j]);
+    ST_ASSERT(c->label[i]);
+    c->x[i] = malloc(sizeof(StReal_t)*c->len);
+    ST_ASSERT(c->x[i]);
+    memcpy(c->x[i], &s->x[j][fromI], sizeof(StReal_t)*c->len);
+  }
+
+  return c;
+}
+
+void stSequence_deriv(struct StSequence *s, int from, int to,
+    int deriv_num/* 1 for 1st derivative*/, int poly_order, int points)
+{
+  ASSERT_SEQUENCE(s);
+  ST_ASSERT(from != to);
+  ST_ASSERT(from < s->dof);
+
+  if(to >= s->dof)
+  {
+    ST_ASSERT(to == s->dof);
+    stSequence_appendDof(s, "%s^d%d(%dpt,x^%d)",
+        s->label[from], deriv_num, points, poly_order);
+    ASSERT(s->dof > to);
+  }
+  else
+    // we must be clobbering an array
+    stSequence_setLabel(s, to, "%s^d%d(%dpt,x^%d)",
+        s->label[from], deriv_num, points, poly_order);
+
+  stDeriv(s->x[from], s->x[to], s->len, deriv_num, poly_order, points);
+}
+
+void stSequence_integrate(struct StSequence *s, int from, int to,
+    int poly_order, int points, StReal_t start)
+{
+  ASSERT_SEQUENCE(s);
+  ST_ASSERT(from != to);
+  ST_ASSERT(from < s->dof);
+
+  if(to >= s->dof)
+  {
+    ST_ASSERT(to == s->dof);
+    stSequence_appendDof(s, "%s^d-1(%dpt,x^%d)",
+        s->label[from], points, poly_order);
+    ASSERT(s->dof > to);
+  }
+  else
+    // we must be clobbering an array
+    stSequence_setLabel(s, to, "%s^d-1(%dpt,x^%d)",
+        s->label[from], points, poly_order);
+
+  stIntegrate(s->x[from], s->x[to], s->len, poly_order, points, start);
 }

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../config.h"
+#include "../qb_config.h"
 
 int main(void)
 {

@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <dlfcn.h>
 #include <signal.h>
-#include "st_debug.h"
+#include "st.h"
 #include "debug.h"
 
 

@@ -3,7 +3,175 @@
   stHeader('Arc Length and Related');
 ?>
 
+<h1>Arc Length, Curvature, and Related</h1>
 
+<p>
+  The motivation for this study is to generalize the notion of trip along
+  a path, where we wish to remove the notion of where we are traveling and
+  focus more on how we are traveling.
+  If we had a very high sample rate, like 88,200 Hz, for Cartesian
+  coordinates \(x\) and \(y\) we could do a simple linear vibrational
+  spectra analysis which could make a good distinguishing signature for the
+  vehicle being driven, but we have a very low sample rate, 1 Hz, and
+  low resolution (~ 0.1 meters) and noisy (at least due to rounding) to boot.
+</p>
+
+
+<h2>Arc Length</h2>
+
+<p>
+  If we ride in a wheeled vehicle the arc length that we travel is
+  proportional to the number of rotations that the wheels turn, assuming
+  that the wheels to not slip on the road.
+  Arc length can be thought of are total distance traveled when we
+  straighten out the roads, or the total distance traveled "not as
+  the crow flies."
+</p>
+
+<p>
+  We defining arc length in 2-D (\(x\) and \(y\)); it would appear that it
+  is not, in general, simple analytic function of \(x\) and \(y\).  It's not
+  possible to write
+
+  \[  s = s(x,y) \mathrm{,} \label{s_xy_wrong}\]
+
+  arc length, \(s\) as a function of displacements in Cartesian
+  coordinates \(x\) and \(y\) of any other coordinate system.
+  In general \(s\) can have more than one value
+  at a given \(x\),\(y\) value.  There may be very specific 
+  cases when we can write a form like [\(\ref{s_xy_wrong}\)],
+  but never in general.
+
+  Arc length, \(s\), tends to be defined in terms of either
+  a differential equation, integral equation, or as a parameter
+  in a parametric vector equation.  All of them work the same.
+
+  We have the Pythagorean differential form
+
+  \[  \mathrm{d} s ^2 = \mathrm{d} x^2 + \mathrm{d} y^2 \, \mathrm{,}  \]
+
+  the integral form
+
+  \[ s = \int_{t^\prime=0}^t \left[
+    \left(\frac{\mathrm{d}x}{\mathrm{d}t^\prime}\right)^2 +
+    \left(\frac{\mathrm{d}y}{\mathrm{d}t^\prime}\right)^2
+        \right] \mathrm{d} t^\prime \, \mathrm{,}  \label{s_int_xy}
+   \]
+
+  where we integrate over time \(t^\prime\);
+
+  and the parametric vector equation, if we can write it, is
+
+  \[ \vec{r}(s) = x(s)\,\hat{x} + y(s)\,\hat{y} \, \mathrm{,} \]
+
+  where \(\hat{x}\) is the constant unit vector in the \(x\)
+  direction, and \(\hat{y}\) is the constant unit vector in the \(y\)
+  direction.
+  Playing around with the these equations there's lots of other
+  forms that that we can have.
+</p>
+
+<p>
+  It's clear that arc length is a purely a geometrical quantity
+  and it can be defined by just spacial constructs, but in our
+  calculations of it we are required to use the speed of object
+  in it's travel.  Why? 
+</p>
+
+
+<p>
+  We'll use [\(\ref{s_int_xy}\)] given \(x(t)\) and \(y(t)\) as
+  data at fixed time \(t\) steps, to get \(s(t)\) at the same
+  fixed time, \(t\), steps. 
+</p>
+
+
+<h2>Curvature</h2>
+
+<p>
+  We have chosen arc length as one degree of freedom.
+  We choose curvature, \(\kappa\), as the generated
+  coordinate compliment to arc length, \(s\).
+  We in 2-D motion we need transformation from
+  Cartesian coordinates \(x, y\) to \(s, \kappa\).
+  At any point in the path the change in
+  \(s\) and \(\kappa\) are perpendicular.
+</p>
+
+<p>
+  We can express \(\kappa\) is the magnitude a vector
+
+  \[  \kappa =
+    \frac{\left|\dot{\vec{r}} \times \ddot{\vec{r}}\right|}
+      {\left| \dot{\vec{r}}\right|^3}
+   \]
+  where \(\hat{n}\) is the unit normal vector,
+  \(\dot{\vec{r}}\) is the velocity vector, and
+  \(\ddot{\vec{r}}\) is the acceleration vector.
+  Note that \(\kappa\) is positive if we travel
+  in a counter-clock-wise circle and negative
+  if we travel in a clock-wise circle.
+
+  In 2-D, we can write \(\kappa\) in terms of
+  \(x\) and \(y\) as
+
+  \[ \kappa = \frac{\dot{x}\,\ddot{y} - \dot{y}\,\ddot{x}}
+        { \sqrt{\left( \dot{x}^2 + \dot{y}^2 \right)^3}}
+        \mathrm{.}
+  \]
+</p>
+
+<p>
+  Dividing by \(\left|\dot{\vec{r}}\right|^3\) is not so appealing.
+  We see that in order to go in a path that is not straight we must
+  accelerate, so why not use a measure like the component of
+  acceleration that is perpendicular to the velocity like where the
+  acceleration is the vector sum of the of two components
+
+  \[
+      \ddot{\vec{r}} \equiv \ddot{r}_T\,\hat{T} + \ddot{r}_n\,\hat{n}
+  \]
+  
+    where \(\hat{T}\) is the unit tangent vector that is in the
+    direction of \(\dot{\vec{r}}\) and \(\hat{n}\) is the unit vector
+    in the direction that we are curving toward.
+
+    We have
+  \[
+      \ddot{r}_n = \frac{
+          \left|\dot{\vec{r}} \times \ddot{\vec{r}}\right|}
+          {\left|\dot{\vec{r}}\right|}
+  \]
+
+  giving
+
+  \[
+      \ddot{r}_n = \frac{\dot{x}\,\ddot{y} - \dot{y}\,\ddot{x}}
+            {\sqrt{\dot{x}^2 + \dot{y}^2}}\mathrm{.}
+  \]
+
+  It can be shown that
+
+  \[
+      \ddot{\vec{r}} = \frac{\mathrm{d}^2 s}{\mathrm{d} t^2}
+             \,\hat{T} +
+      \left(\frac{\mathrm{d} s}{\mathrm{d} t}\right)^2 \,\kappa\,
+        \hat{n} \, \mathrm{.}
+   \]
+
+</p>
+
+
+  <h3>References</h3>
+
+  
+
+  <ul>
+    <li><a href="http://en.wikipedia.org/wiki/Arc_length">Wikipedia
+      Arc Length</a></li>
+    <li><a href="http://en.wikipedia.org/wiki/Curvature">Wikipedia
+      Curvature</a></li>
+  </ul>
 
 <?php
   stFooter();

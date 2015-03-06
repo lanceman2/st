@@ -70,7 +70,7 @@ set -x
 ###########################################################
 # top source directory files
 ###########################################################
-rm -f README.html qb_config config.h qb_php_compile
+rm -f README.html qb_config qb_config.h qb_php_compile
 rm_common
 
 ###########################################################
@@ -80,7 +80,7 @@ cd libst/ || FAIL
 
 rm_common
 rm -f debug.h lib_main.c st.pc st.h\
- sequence_deriv_coef.h sequence_int_matrix.h
+ deriv_coef.h int_matrix.h
 
 cd .. || FAIL
 

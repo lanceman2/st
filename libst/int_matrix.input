@@ -27,9 +27,9 @@ powerMax := 5 -- x^Max fit
 
 -- m
 pointsMin := 2 -- min number of points to fit
-pointsMax := 6 -- max number of points to fit
+pointsMax := 8 -- max number of points to fit
 
-outPath := "sequence__int__matrix.h"
+outPath := "int__matrix.h"
 
 --
 ---------------------------------------------------------------------

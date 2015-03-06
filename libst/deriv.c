@@ -4,18 +4,14 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <stdbool.h>
-#include "st_debug.h"
-#include "st_type.h"
-#include "type.h"
-#include "st_sequence.h"
+#include "st.h"
 #include "debug.h"
-#include "sequence.h"
 
 
 /* See file ../doc/differentiation.html for details:
  *
  * "Notes on Numerical Differentiation" for calculations of the constants
- * in the expressions below in the generated file sequence_deriv_coef.h
+ * in the expressions below in the generated file deriv_coef.h
  *
  * We used axiom (open-axiom) to calculate them.
  *
@@ -23,7 +19,7 @@
 // This code assumes that the sample rate is fixed at 1 so h = 1.
 
 
-#include "sequence_deriv_coef.h"
+#include "deriv_coef.h"
 
 
 static inline void
@@ -42,49 +38,27 @@ _deriv(StReal_t *out, const StReal_t *in,
 //SPEW("val      =%g\n\n", *out);
 }
 
-
-void stSequence_deriv(struct StSequence *s, int from, int to,
+void stDeriv(const StReal_t *in, StReal_t *out, size_t len,
     int deriv_num/* 1 for 1st derivative*/, int poly_order, int points)
 {
-  ASSERT(s);
-  ASSERT(s->x);
-  ASSERT(s->x[0]);
-  ASSERT(s->dof > 0);
-  ASSERT(s->len);
-  ASSERT(from != to);
+  ASSERT(in);
+  ASSERT(out);
+  ASSERT(in != out);
   ASSERT(poly_order >= 1);
-  ST_ASSERT(from < s->dof);
   ST_VASSERT(points > poly_order,
       "You cannot fit a polynomial of order x^%d with "
       "just %d points.\n", poly_order, points);
-  ST_VASSERT(s->len >= points,
+  ST_VASSERT(len >= points,
       "You cannot differentiate just %zu data points, "
-      "at least %d points are needed.\n", s->len, points);
+      "at least %d points are needed.\n", len, points);
 
   const StReal_t *coef = 0;
   coef = _get_coef(deriv_num, poly_order, points);
-
 
   ST_VASSERT(coef,
     "case with deriv_num=%d, poly_order=%d, points=%d not written",
     deriv_num, poly_order, points);
 
-  if(to >= s->dof)
-  {
-    ST_ASSERT(to == s->dof);
-    _stSequence_appendDof(s, "%s^d%d(%dpt,x^%d)",
-        s->label[from], deriv_num, points, poly_order);
-    ASSERT(s->dof > to);
-  }
-  else
-    // we must be clobbering an array
-    stSequence_setLabel(s, to, "%s^d%d(%dpt,x^%d)",
-        s->label[from], deriv_num, points, poly_order);
-
-  StReal_t *in, *out;
-  in = s->x[from];
-  out = s->x[to];
- 
   int i,n, sign = 1;
 
   n = (points-1)/2;
@@ -93,10 +67,10 @@ void stSequence_deriv(struct StSequence *s, int from, int to,
     _deriv(out++, in, coef, 1, sign, points);
     coef += points;
   }
-  n = s->len - points/2;
+  n = len - points/2;
   for(;i<n;++i)
     _deriv(out++, in++, coef, 1, sign, points);
-  n = s->len;
+  n = len;
   if(points & 01)
     // odd number of points
     --coef;

@@ -5,8 +5,7 @@
 -- )read diff_coef
 ---------------------------------------------------------------------
 ---------------------------------------------------------------------
--- This calculates numbers for the code in sequence_deriv.c
--- and sequence_int.c
+-- This calculates numbers for the code in deriv.c and int.c
 --
 -- Computing this by pencil and paper would be very time consuming.
 --
@@ -80,7 +79,7 @@ diffCoefThetaCoef(a, m, n, p) == row(diffCoefMatrix(a,m,n), p+1)
 diffCoefCheck: (PositiveInteger, PositiveInteger, Integer) -> Boolean
 diffCoefCheck(n, m, p) ==
   if m < (n + 1) then return false -- Example: cannot fit x^3 with less than 4 points
-  -- cannot take 2nd derivative with less than 3 points
+  -- cannot take 2nd derivative with less tha =n 3 points
   if m < (p + 1) then return false
   if n < p then return false -- cannot for this case
   return true -- success, we can compute a \theta matrix thingy
