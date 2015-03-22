@@ -683,17 +683,16 @@
   <p>
   We looked and saw what looks like:
   </p>
-     <ul>
-       <li>We are over-fitting the data.  It needs a lower order polynomial fit
-         to remove some of the giggling that we clearly don't want.  We'll
-       need to use linear regression to find the polynomial.</li>
-       <li>We need to reduce the effect of data as the dependent variable
-       (time) is farther away from the point we are getting a derivative
-       for.  That may be automatic given the nature of polynomial
-       functions.  If we used sines and cosines as basis functions than
-       we'd have a problem with far away (in time) values effecting
-       current values.</li>
-    </ul>
+
+   <ul>
+     <li>We are over-fitting the data.  It needs a lower order polynomial fit
+       to remove some of the giggling that we clearly don't want.  We'll
+     need to use linear regression to find the polynomial.  We do this
+     in the next section.</li>
+     <li>We need to reduce the effect of data as the dependent variable
+     (time) is farther away from the point we are getting a derivative
+     for.  We work on this in the next next section.</li>
+  </ul>
 
 
     <h2>Differentiation Using Least Squares Fit Polynomials</h2>
@@ -778,8 +777,10 @@
 
       We wish to find the value of the vector \(\theta\) which
       makes [\(\ref{psi_eq_F}\)] for \(m = n + 1\), or if \(m \gt n + 1\) minimize
+      the following cost function
       \[
-      \sum_{j=1}^m \left[\Psi_\theta(\chi_j) - F(\chi_j)\right]^2  \mathrm{.}
+      \sum_{j=1}^m \left[\Psi_\theta(\chi_j) - F(\chi_j)\right]^2
+        \label{LR_cost} \mathrm{.}
       \]
 
 
@@ -1096,7 +1097,58 @@
      </p>
 
 
+  <h2>Making the Fit Function More Local</h2>
+
+  <p>
+    We wish to reduce the effect of distant points on local
+    values.  We change the effect that distant points have
+    by adding a weight function to the cost function that we
+    are minimizing by rewriting [\(\ref{LR_cost}\)] like so
+
+    \[
+        \sum_{j=1}^m w_j \left[\Psi_\theta(\chi_j) - F(\chi_j)\right]^2
+            \label{LRW_cost} \, \mathrm{,}
+    \]
+    where \(W_j\) is weight function where
+    \[
+        w_j \geq 0 \, \mathrm{.}
+    \]
+
+    We call is a weight function, but it's just the discrete
+    sampled values of a weight function.
+    A common weight function is the Gaussian function as in
+
+    \[
+        W_j = \mathrm{e}^\frac{\chi_j^2}{2 \sigma} \, \mathrm{,}
+    \]
+    where \(\sigma\) is a chosen constant.
+    Note that this Gaussian function is centered and peaked
+    at \(\chi_j = 0\).  Using this Gaussian weight function
+    we decrease the cost of the fit function as we increase
+    the magnitude of \(\chi_j\) which we like.
+  </p>
+
+  <p>
+    Again we can exactly solve to find the value of vector \(\theta\)
+    that minimize the new cost function [\(\ref{LRW_cost}\)]
+    from <a
+    href="http://en.wikipedia.org/wiki/Linear_least_squares_%28mathematics%29#Weighted_linear_least_squares"
+    >Weighted linear least squares</a>
+    
+      \[
+      \theta = \left(X^T W X\right)^{-1} X^T W F(\chi) \, \mathrm{,}
+      \]
+    where \(W\) is a diagonal matrix with elements \(w_j\) on the
+    diagonal.
+  </p>
+
+
+
   <h2>Application</h2>
+
+  <p style="font-size:120%;">
+    TODO: add weight function.
+  </p>
 
   <p>
     We wrote the libst library C function
@@ -1134,6 +1186,7 @@
           f(x) + \mathrm{constant} \, \mathrm{.}
   \]
   </p>
+
 
 
   <h3>References</h3>
